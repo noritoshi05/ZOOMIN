@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		96517FDA2FC90110008E6324 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96517FD92FC90110008E6324 /* MapKit.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		96517FAE2FC8FE71008E6324 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,6 +31,7 @@
 		96517F9E2FC8FE6E008E6324 /* ZOOMIN.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ZOOMIN.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		96517FAD2FC8FE71008E6324 /* ZOOMINTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZOOMINTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		96517FB72FC8FE71008E6324 /* ZOOMINUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ZOOMINUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		96517FD92FC90110008E6324 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.2.sdk/System/Library/Frameworks/MapKit.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -52,6 +57,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96517FDA2FC90110008E6324 /* MapKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +84,7 @@
 				96517FA02FC8FE6E008E6324 /* ZOOMIN */,
 				96517FB02FC8FE71008E6324 /* ZOOMINTests */,
 				96517FBA2FC8FE71008E6324 /* ZOOMINUITests */,
+				96517FD82FC90110008E6324 /* Frameworks */,
 				96517F9F2FC8FE6E008E6324 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -90,6 +97,14 @@
 				96517FB72FC8FE71008E6324 /* ZOOMINUITests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		96517FD82FC90110008E6324 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				96517FD92FC90110008E6324 /* MapKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -398,6 +413,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to attach photos to maintenance reports.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -442,6 +458,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_NSCameraUsageDescription = "This app uses the camera to attach photos to maintenance reports.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;

@@ -1,32 +1,14 @@
-//
-//  ZOOMINApp.swift
-//  ZOOMIN
-//
-//  Created by 김승준 on 5/29/26.
-//
+// ZOOMINApp.swift
+// ZOOMIN - 앱 진입점
+// 역할: @main 앱 구조체, ContentView를 루트로 설정
 
 import SwiftUI
-import SwiftData
 
 @main
 struct ZOOMINApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
-        do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
-        } catch {
-            fatalError("Could not create ModelContainer: \(error)")
-        }
-    }()
-
     var body: some Scene {
         WindowGroup {
             ContentView()
         }
-        .modelContainer(sharedModelContainer)
     }
 }
