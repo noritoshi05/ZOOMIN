@@ -47,7 +47,7 @@ struct ContentView: View {
                 .tag(Tab.map.rawValue)
 
             // ── 탭 2: 신고하기 (Member 2 담당) ──────────────────────────
-            ReportPlaceholderView()
+            ReportView()
                 .tabItem { Label(Tab.report.title, systemImage: Tab.report.icon) }
                 .tag(Tab.report.rawValue)
 
