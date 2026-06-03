@@ -1,28 +1,28 @@
 // IssueStatus.swift
 // ZOOMIN - Shared model file
-// ⚠️ 팀 공용 파일: 이 파일은 모든 팀원이 동일하게 사용합니다.
-// 주의: symbolName, badgeColor, badgeTextColor는 ZOOMINStyle.swift extension에서 정의됩니다.
+// ⚠️ Shared file: Do not modify individually. All team members use the same file.
+// Note: symbolName, badgeColor, badgeTextColor are defined in ZOOMINStyle.swift extension.
 
 import SwiftUI
 
-/// 신고 처리 상태
+/// Report processing status
 enum IssueStatus: String, CaseIterable, Codable {
     case received   = "received"
     case reviewing  = "reviewing"
     case inProgress = "inProgress"
     case completed  = "completed"
 
-    /// 화면에 표시할 한국어 이름
+    /// Display name shown on screen
     var displayName: String {
         switch self {
-        case .received:   return "접수됨"
-        case .reviewing:  return "검토 중"
-        case .inProgress: return "처리 중"
-        case .completed:  return "완료"
+        case .received:   return "Received"
+        case .reviewing:  return "Reviewing"
+        case .inProgress: return "In Progress"
+        case .completed:  return "Completed"
         }
     }
 
-    /// 관리자가 선택 가능한 다음 상태들
+    /// Next available statuses for admin
     var nextStatuses: [IssueStatus] {
         switch self {
         case .received:   return [.reviewing, .inProgress]
@@ -32,5 +32,5 @@ enum IssueStatus: String, CaseIterable, Codable {
         }
     }
 }
-// 참고: symbolName / badgeColor / badgeTextColor 는 ZOOMINStyle.swift 의
-//      extension IssueStatus 블록에서 정의됩니다.
+// Note: symbolName / badgeColor / badgeTextColor are defined in
+//       the extension IssueStatus block in ZOOMINStyle.swift.

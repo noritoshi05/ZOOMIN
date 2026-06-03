@@ -1,6 +1,6 @@
 // ZOOMINApp.swift
-// ZOOMIN - 앱 진입점
-// 역할: @main 앱 구조체, ContentView를 루트로 설정
+// ZOOMIN - App entry point
+// Role: @main app struct, sets ContentView as root
 
 import SwiftUI
 import FirebaseCore

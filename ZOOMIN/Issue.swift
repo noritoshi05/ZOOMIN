@@ -1,55 +1,55 @@
 // Issue.swift
 // ZOOMIN - Shared model file
-// ⚠️ 팀 공용 파일: 이 파일은 모든 팀원이 동일하게 사용합니다. 절대 수정하지 마세요.
+// ⚠️ Shared file: Do not modify individually. All team members use the same file.
 
 import Foundation
 import UIKit
 
-/// ZOOMIN 앱의 핵심 신고 데이터 모델
+/// Core report data model for the ZOOMIN app
 struct Issue: Identifiable, Codable, Hashable {
 
-    // MARK: - 기본 속성
+    // MARK: - Basic Properties
     let id: UUID
     var title: String
     var category: IssueCategory
     var description: String
 
-    // MARK: - 위치
+    // MARK: - Location
     var latitude: Double
     var longitude: Double
 
-    // MARK: - 사진
-    /// 앱 번들에 포함된 샘플 이미지 이름 (fallback용)
+    // MARK: - Photo
+    /// Sample image name included in app bundle (fallback)
     var imageName: String?
-    /// 카메라로 찍은 실제 사진 데이터 (로컬 저장)
-    /// SwiftUI 사용법: if let uiImg = issue.uiImage { Image(uiImage: uiImg) }
+    /// Actual photo data taken by camera (local storage)
+    /// SwiftUI usage: if let uiImg = issue.uiImage { Image(uiImage: uiImg) }
     var photoData: Data?
 
-    // MARK: - 지역 주민 참여
+    // MARK: - Community Support
     var supportCount: Int
 
-    // MARK: - 우선순위 요소 (1~5점)
-    var safetyRisk: Int     // 안전 위험도
-    var urgency: Int        // 긴급도
-    var publicImpact: Int   // 공공 영향도
+    // MARK: - Priority Factors (1~5 points each)
+    var safetyRisk: Int     // Safety risk level
+    var urgency: Int        // Urgency level
+    var publicImpact: Int   // Public impact level
 
-    // MARK: - 처리 상태
+    // MARK: - Processing Status
     var status: IssueStatus
 
-    // MARK: - 날짜
+    // MARK: - Dates
     var reportDate: Date
     var completionDate: Date?
 
-    // MARK: - 완료 보고
+    // MARK: - Completion Report
     var completionSummary: String?
 
-    // MARK: - 보상
+    // MARK: - Reward
     var rewardPoints: Int
 
-    // MARK: - 내 신고 여부
+    // MARK: - My Report Flag
     var isMyReport: Bool
 
-    // MARK: - 생성자
+    // MARK: - Initializer
     init(
         id: UUID = UUID(),
         title: String,
@@ -90,8 +90,8 @@ struct Issue: Identifiable, Codable, Hashable {
         self.isMyReport = isMyReport
     }
 
-    // MARK: - Computed: 지지 점수 (조작 방지를 위해 최대 3점으로 제한)
-    /// 0~5 건 → 0점 / 6~10 건 → 1점 / 11~20 건 → 2점 / 21+ 건 → 3점
+    // MARK: - Computed: Support score (capped at 3 to prevent manipulation)
+    /// 0-5 → 0pts / 6-10 → 1pt / 11-20 → 2pts / 21+ → 3pts
     var supportScore: Int {
         switch supportCount {
         case 0...5:   return 0
@@ -101,12 +101,12 @@ struct Issue: Identifiable, Codable, Hashable {
         }
     }
 
-    // MARK: - Computed: 우선순위 총점 (최대 18점)
+    // MARK: - Computed: Total priority score (max 18)
     var priorityScore: Int {
         safetyRisk + urgency + publicImpact + supportScore
     }
 
-    // MARK: - Computed: 우선순위 등급
+    // MARK: - Computed: Priority level
     var priorityLevel: PriorityLevel {
         switch priorityScore {
         case 13...18: return .high
@@ -115,14 +115,14 @@ struct Issue: Identifiable, Codable, Hashable {
         }
     }
 
-    // MARK: - Computed: UIImage 변환 헬퍼
+    // MARK: - Computed: UIImage conversion helper
     var uiImage: UIImage? {
         guard let data = photoData else { return nil }
         return UIImage(data: data)
     }
 }
 
-// MARK: - 우선순위 등급
+// MARK: - Priority Level
 enum PriorityLevel: String, Codable, Hashable {
     case high   = "High"
     case medium = "Medium"
@@ -130,9 +130,9 @@ enum PriorityLevel: String, Codable, Hashable {
 
     var displayName: String {
         switch self {
-        case .high:   return "높음"
-        case .medium: return "보통"
-        case .low:    return "낮음"
+        case .high:   return "High"
+        case .medium: return "Medium"
+        case .low:    return "Low"
         }
     }
 }

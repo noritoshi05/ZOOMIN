@@ -82,7 +82,7 @@ struct AdminDashboardView: View {
                 Image(systemName: "person.badge.shield.checkmark.fill")
                     .foregroundColor(.zoominBlue)
                     .font(.system(size: 14))
-                Text("관리자 모드")
+                Text("Admin Mode")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.zoominBlue)
             }
@@ -97,10 +97,10 @@ struct AdminDashboardView: View {
             // 헤더
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("전체 신고 현황")
+                    Text("All Reports")
                         .font(ZOOMINFont.title3)
                         .foregroundColor(.textPrimary)
-                    Text("우선순위 순으로 정렬되어 있습니다")
+                    Text("Sorted by priority")
                         .font(ZOOMINFont.micro)
                         .foregroundColor(.textSecondary)
                 }
@@ -117,10 +117,10 @@ struct AdminDashboardView: View {
 
             // 상태별 카운트 4칸
             HStack(spacing: 8) {
-                AdminStatChip(label: "접수됨",  count: receivedCount,   color: .statusReceived)
-                AdminStatChip(label: "검토 중", count: reviewingCount,  color: .statusReviewing)
-                AdminStatChip(label: "처리 중", count: inProgressCount, color: .statusInProgress)
-                AdminStatChip(label: "완료",    count: completedCount,  color: .statusCompleted)
+                AdminStatChip(label: "Received",  count: receivedCount,   color: .statusReceived)
+                AdminStatChip(label: "Reviewing", count: reviewingCount,  color: .statusReviewing)
+                AdminStatChip(label: "In Progress", count: inProgressCount, color: .statusInProgress)
+                AdminStatChip(label: "Completed",    count: completedCount,  color: .statusCompleted)
             }
         }
         .zoominCard()
@@ -170,7 +170,7 @@ struct AdminDashboardView: View {
                 Image(systemName: "arrow.up.arrow.down")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundColor(.textSecondary)
-                Text("우선순위 높은 순")
+                Text("Highest priority first")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.textSecondary)
                 Spacer()
@@ -183,8 +183,8 @@ struct AdminDashboardView: View {
                 // 빈 상태
                 ZOOMINEmptyStateView(
                     mood: .done,
-                    title: "해당 신고가 없습니다",
-                    message: "선택한 필터에 해당하는\n신고가 없어요"
+                    title: "No reports found",
+                    message: "No reports match the selected filter"
                 )
                 .frame(maxWidth: .infinity)
                 .zoominCard()
@@ -274,7 +274,7 @@ struct AdminIssueCard: View {
                     HStack(spacing: 6) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 11, weight: .bold))
-                        Text("우선순위 높음 — 즉각 처리 필요")
+                        Text("High Priority — Immediate action required")
                             .font(ZOOMINFont.micro)
                             .fontWeight(.semibold)
                     }

@@ -45,7 +45,7 @@ struct CompletionReportView: View {
                     .padding(.bottom, 32)
                 }
             }
-            .navigationTitle("완료 보고서")
+            .navigationTitle("Completion Report")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -53,16 +53,16 @@ struct CompletionReportView: View {
                         .foregroundColor(.textSecondary)
                 }
             }
-            .alert("완료 처리하시겠어요?", isPresented: $showConfirm) {
+            .alert("Mark as completed?", isPresented: $showConfirm) {
                 Button("완료 처리", role: .destructive) { submitReport() }
                 Button("취소", role: .cancel) {}
             } message: {
-                Text("처리 완료로 변경되며 주민에게 보상 포인트가 지급됩니다.")
+                Text("Status will be set to Completed and reward points will be sent to the reporter.")
             }
-            .alert("완료 처리되었습니다 ✅", isPresented: $isDone) {
-                Button("확인") { dismiss() }
+            .alert("Completed ✅", isPresented: $isDone) {
+                Button("OK") { dismiss() }
             } message: {
-                Text("보고서가 저장되고 신고자에게 포인트가 지급되었습니다.")
+                Text("Report saved and points awarded to the reporter.")
             }
         }
     }
@@ -76,7 +76,7 @@ struct CompletionReportView: View {
                 Image(systemName: "checkmark.seal.fill")
                     .foregroundColor(.statusCompleted)
                     .font(.system(size: 14))
-                Text("처리 완료 보고서 작성")
+                Text("Write Completion Report")
                     .font(ZOOMINFont.title3)
                     .foregroundColor(.textPrimary)
             }
@@ -113,7 +113,7 @@ struct CompletionReportView: View {
             // 신고 내용 간략 표시
             if !issue.description.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("신고 내용")
+                    Text("Report Description")
                         .font(ZOOMINFont.captionBold)
                         .foregroundColor(.textSecondary)
                     Text(issue.description)
@@ -135,7 +135,7 @@ struct CompletionReportView: View {
         VStack(alignment: .leading, spacing: 12) {
 
             HStack {
-                Text("처리 결과 요약")
+                Text("Summary of Resolution")
                     .font(ZOOMINFont.title3)
                     .foregroundColor(.textPrimary)
                 Spacer()
@@ -149,7 +149,7 @@ struct CompletionReportView: View {
             // 텍스트 에디터
             ZStack(alignment: .topLeading) {
                 if summaryText.isEmpty {
-                    Text("처리 내용을 간략히 작성해 주세요.\n예) 포트홀 아스팔트 보수 완료 (2024.06.01 시공), 향후 6개월 추가 모니터링 예정")
+                    Text("Briefly describe the resolution. e.g. Pothole repaired on June 1, 2024. Monitoring scheduled for 6 months.")
                         .font(ZOOMINFont.body)
                         .foregroundColor(.textTertiary)
                         .padding(.top, 8)
@@ -190,13 +190,13 @@ struct CompletionReportView: View {
 
             // 작성 가이드
             VStack(alignment: .leading, spacing: 4) {
-                Text("작성 가이드")
+                Text("Writing Guide")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.textSecondary)
                 ForEach([
-                    "구체적인 처리 방법 및 완료 날짜",
-                    "사용된 자재·인력·장비 (간략히)",
-                    "향후 모니터링 계획 (선택)"
+                    "Specific resolution method and completion date",
+                    "Materials / personnel / equipment used (brief)",
+                    "Follow-up monitoring plan (optional)"
                 ], id: \.self) { hint in
                     HStack(alignment: .top, spacing: 6) {
                         Text("•")
@@ -220,10 +220,10 @@ struct CompletionReportView: View {
                 .foregroundColor(.rewardGold)
 
             VStack(alignment: .leading, spacing: 3) {
-                Text("완료 처리 시 신고자 보상")
+                Text("Reward for reporter on completion")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.textPrimary)
-                Text("완료 보고서 제출 후 포인트가 자동 지급됩니다")
+                Text("Points are automatically awarded after submitting the report")
                     .font(ZOOMINFont.micro)
                     .foregroundColor(.textSecondary)
             }
@@ -234,7 +234,7 @@ struct CompletionReportView: View {
                 Text("+35 P")
                     .font(ZOOMINFont.title2)
                     .foregroundColor(.rewardGold)
-                Text("완료+피드백")
+                Text("Complete+Feedback")
                     .font(ZOOMINFont.micro)
                     .foregroundColor(.textTertiary)
             }
@@ -250,7 +250,7 @@ struct CompletionReportView: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.seal.fill")
-                Text("완료 처리 및 보고서 제출")
+                Text("Submit Completion Report")
                     .font(ZOOMINFont.bodyBold)
             }
         }

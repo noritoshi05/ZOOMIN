@@ -1,7 +1,7 @@
 // MapView.swift
-// ZOOMIN — Member 1 담당
-// 역할: 지도 화면 / 신고 마커 / 하단 Nearby Issues 카드 / IssueDetailView 이동
-// 디자인: ZOOMINStyle 완전 적용 / 도시 인프라 유지관리 플랫폼 관점 강조
+// ZOOMIN — Member 1
+// Role: Map screen / Report markers / Bottom Nearby Issues card / IssueDetailView navigation
+// Design: Full ZOOMINStyle applied / Urban infrastructure management platform
 
 import SwiftUI
 import MapKit
@@ -12,7 +12,7 @@ struct MapView: View {
 
     @EnvironmentObject var issueStore: IssueStore
 
-    // 지도 카메라 (서울 중심 기본값)
+    // Map camera (Seoul center default)
     @State private var cameraPosition: MapCameraPosition = .region(
         MKCoordinateRegion(
             center: CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780),
@@ -32,22 +32,22 @@ struct MapView: View {
         NavigationStack {
             ZStack(alignment: .bottom) {
 
-                // ── 지도 본체 ────────────────────────────────────────────
+                // ── Map body───────────────────────────────────────────
                 mapBody
                     .ignoresSafeArea(edges: .top)
 
-                // ── 우하단 내 위치 버튼 ──────────────────────────────────
+                // ── Bottom-right location button─────────────────────────────────
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
                         locationButton
                             .padding(.trailing, 20)
-                            .padding(.bottom, 220) // Nearby 패널 높이 위
+                            .padding(.bottom, 220) // Above Nearby panel height
                     }
                 }
 
-                // ── 하단 Nearby Issues 패널 ──────────────────────────────
+                // ── Bottom Nearby Issues panel─────────────────────────────
                 VStack(spacing: 0) {
                     Spacer()
                     nearbyIssuesPanel
@@ -84,7 +84,7 @@ struct MapView: View {
         }
     }
 
-    // MARK: - 지도 본체
+    // MARK: - Map Body
 
     private var mapBody: some View {
         Map(position: $cameraPosition, interactionModes: .all, selection: $selectedIssueID) {
@@ -116,22 +116,22 @@ struct MapView: View {
         }
     }
 
-    // MARK: - 하단 Nearby Issues 패널
+    // MARK: - Bottom Nearby Issues Panel
 
     private var nearbyIssuesPanel: some View {
         VStack(spacing: 0) {
-            // 헤더 행
+            // Header row
             HStack(alignment: .center) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Nearby Issues")
                         .font(ZOOMINFont.title3)
                         .foregroundStyle(Color.textPrimary)
-                    Text("도로·보도·시설물 유지관리 신고 현황")
+                    Text("Road · Sidewalk · Facility Reports")
                         .font(ZOOMINFont.micro)
                         .foregroundStyle(Color.textSecondary)
                 }
                 Spacer()
-                // 통계 칩
+                // Stat chips
                 statsRow
                 Button("View All") {
                     showNearbySheet = true
@@ -144,7 +144,7 @@ struct MapView: View {
             .padding(.top, 14)
             .padding(.bottom, 10)
 
-            // 가로 스크롤 이슈 카드 목록
+            // Horizontal scroll issue card list
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(issueStore.sortedByPriority.prefix(8)) { issue in
@@ -152,7 +152,7 @@ struct MapView: View {
                             issue: issue,
                             isSelected: selectedIssueID == issue.id,
                             onTap: {
-                                // 카드 탭: 지도 이동 + 마커 선택만 (상세 화면 이동 없음)
+                                // Card tap: map move + marker select only (no detail navigation)
                                 withAnimation(.easeInOut(duration: 0.5)) {
                                     selectedIssueID = issue.id
                                     cameraPosition = .region(
@@ -167,7 +167,7 @@ struct MapView: View {
                                 }
                             },
                             onDetailTap: {
-                                // ">" 버튼 탭: 상세 화면으로 이동
+                                // ">" button tap: navigate to detail screen
                                 selectedIssue = issue
                             }
                         )
@@ -182,13 +182,13 @@ struct MapView: View {
         .shadow(color: .black.opacity(0.10), radius: 16, y: -4)
         .padding(.horizontal, 12)
         .padding(.bottom, 8)
-        // 전체 목록 시트
+        // Full list sheet
         .sheet(isPresented: $showNearbySheet) {
             AllIssuesSheet()
         }
     }
 
-    // 간략 통계 칩 (높은 위험 건수)
+    // Brief stat chip (high risk count)
     private var statsRow: some View {
         let highCount = filteredIssues.filter { $0.priorityLevel == .high }.count
         return HStack(spacing: 4) {
@@ -205,11 +205,11 @@ struct MapView: View {
         .clipShape(Capsule())
     }
 
-    // MARK: - 툴바
+    // MARK: - Toolbar
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
-        // 중앙 ZOOMIN 타이틀
+        // Center ZOOMIN title
         ToolbarItem(placement: .principal) {
             HStack(spacing: 6) {
                 Image(systemName: "mappin.circle.fill")
@@ -220,7 +220,7 @@ struct MapView: View {
             }
         }
 
-        // 좌: 카테고리 필터
+        // Left: Category filter
         ToolbarItem(placement: .navigationBarLeading) {
             Button {
                 showFilter.toggle()
@@ -238,7 +238,7 @@ struct MapView: View {
             }
         }
 
-        // 우: 검색
+        // Right: Search
         ToolbarItem(placement: .navigationBarTrailing) {
             Button {
                 showSearch = true
@@ -249,12 +249,12 @@ struct MapView: View {
         }
     }
 
-    // MARK: - 내 위치 버튼
+    // MARK: - My Location Button
 
     private var locationButton: some View {
         Button {
             withAnimation(.easeInOut(duration: 0.5)) {
-                // 시뮬레이터: 서울 중심으로 리셋 / 실기기: 실제 GPS 위치로 이동
+                // Simulator: reset to Seoul center / Real device: move to actual GPS location
                 cameraPosition = .userLocation(fallback: .region(
                     MKCoordinateRegion(
                         center: CLLocationCoordinate2D(latitude: 37.5665, longitude: 126.9780),
@@ -281,7 +281,7 @@ struct MapView: View {
     }
 }
 
-// MARK: - 지도 마커
+// MARK: - Map Marker
 
 struct IssueMapMarker: View {
     let issue: Issue
@@ -290,14 +290,14 @@ struct IssueMapMarker: View {
     var body: some View {
         VStack(spacing: 0) {
             ZStack {
-                // 선택 시 외부 링 펄스
+                // Outer ring pulse when selected
                 if isSelected {
                     Circle()
                         .fill(issue.category.markerColor.opacity(0.20))
                         .frame(width: 52, height: 52)
                 }
 
-                // 메인 원형 마커
+                // Main circular marker
                 Circle()
                     .fill(issue.category.markerColor)
                     .frame(width: isSelected ? 40 : 32, height: isSelected ? 40 : 32)
@@ -309,7 +309,7 @@ struct IssueMapMarker: View {
                             .foregroundStyle(.white)
                     }
 
-                // 높은 우선순위: 우상단 빨간 뱃지
+                // High priority: red badge top-right
                 if issue.priorityLevel == .high && !isSelected {
                     Circle()
                         .fill(Color.riskCritical)
@@ -318,10 +318,10 @@ struct IssueMapMarker: View {
                 }
             }
 
-            // 마커 꼬리
+            // Marker tail
             MarkerTail(color: issue.category.markerColor)
 
-            // 선택 시 점수 뱃지 팝업
+            // Score badge popup when selected
             if isSelected {
                 selectedBadge
                     .transition(.scale(scale: 0.7).combined(with: .opacity))
@@ -373,17 +373,17 @@ private struct Triangle: Shape {
     }
 }
 
-// MARK: - Nearby Issue 가로 스크롤 카드
+// MARK: - Nearby Issue Horizontal Scroll Card
 
 struct NearbyIssueCard: View {
     let issue: Issue
     var isSelected: Bool = false
-    var onTap: () -> Void = {}        // 카드 탭: 지도 이동
-    var onDetailTap: () -> Void = {}  // ">" 버튼 탭: 상세 화면 이동
+    var onTap: () -> Void = {}        // Card tap: map move
+    var onDetailTap: () -> Void = {}  // ">" button: detail screen
 
     var body: some View {
         HStack(spacing: 12) {
-            // 썸네일
+            // Thumbnail
             ZStack {
                 RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusSmall)
                     .fill(issue.category.markerColor.opacity(0.12))
@@ -402,7 +402,7 @@ struct NearbyIssueCard: View {
                 }
             }
 
-            // 정보
+            // Info
             VStack(alignment: .leading, spacing: 5) {
                 Text(issue.title)
                     .font(ZOOMINFont.captionBold)
@@ -420,7 +420,7 @@ struct NearbyIssueCard: View {
                 }
             }
 
-            // ✅ 상세 화면 이동 버튼 (지도 이동과 분리)
+            // ✅ Detail screen button (separate from map move)
             Button {
                 onDetailTap()
             } label: {
@@ -432,17 +432,17 @@ struct NearbyIssueCard: View {
                     .clipShape(Circle())
             }
         }
-        // ✅ 카드 전체 탭 → 지도 이동만
+        // ✅ Full card tap → map move only
         .contentShape(Rectangle())
         .onTapGesture { onTap() }
         .zoominCard(padding: 12)
         .frame(width: 270)
-        // 선택된 카드 테두리 강조
+        // Selected card border highlight
         .overlay(
             RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusLarge)
                 .stroke(isSelected ? Color.zoominBlue : Color.clear, lineWidth: 1.5)
         )
-        // High 우선순위 카드: 좌측 강조 바
+        // High priority card: left accent bar
         .overlay(alignment: .leading) {
             if issue.priorityLevel == .high {
                 RoundedRectangle(cornerRadius: 3)
@@ -455,7 +455,7 @@ struct NearbyIssueCard: View {
     }
 }
 
-// MARK: - 카테고리 필터 시트
+// MARK: - Category Filter Sheet
 
 struct CategoryFilterSheet: View {
     @Binding var selectedCategory: IssueCategory?
@@ -471,7 +471,7 @@ struct CategoryFilterSheet: View {
                     filterRow(
                         icon: "map.fill",
                         color: Color.zoominBlue,
-                        title: "전체 보기",
+                        title: "View All",
                         isSelected: selectedCategory == nil
                     )
                 }
@@ -491,11 +491,11 @@ struct CategoryFilterSheet: View {
                 }
             }
             .listStyle(.insetGrouped)
-            .navigationTitle("카테고리 필터")
+            .navigationTitle("Category Filter")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("닫기") { dismiss() }
+                    Button("Close") { dismiss() }
                         .foregroundStyle(Color.zoominBlue)
                 }
             }
@@ -522,7 +522,7 @@ struct CategoryFilterSheet: View {
     }
 }
 
-// MARK: - 전체 이슈 목록 시트
+// MARK: - Full Issue List Sheet
 
 struct AllIssuesSheet: View {
     @EnvironmentObject var issueStore: IssueStore
@@ -536,13 +536,13 @@ struct AllIssuesSheet: View {
                 if issueStore.issues.isEmpty {
                     ZOOMINEmptyStateView(
                         mood: .search,
-                        title: "신고 없음",
-                        message: "아직 접수된 도시 시설물 신고가 없습니다."
+                        title: "No Reports",
+                        message: "No urban facility reports have been submitted yet."
                     )
                 } else {
                     ScrollView {
                         LazyVStack(spacing: 12) {
-                            // 상단 요약 카드
+                            // Top summary card
                             summaryCard
                                 .padding(.horizontal, ZOOMINLayout.paddingMedium)
                                 .padding(.top, 12)
@@ -556,11 +556,11 @@ struct AllIssuesSheet: View {
                     }
                 }
             }
-            .navigationTitle("전체 신고 현황")
+            .navigationTitle("All Reports")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("닫기") { dismiss() }
+                    Button("Close") { dismiss() }
                         .foregroundStyle(Color.zoominBlue)
                 }
             }
@@ -568,7 +568,7 @@ struct AllIssuesSheet: View {
         .presentationDragIndicator(.visible)
     }
 
-    // 상단 플랫폼 통계 카드
+    // Top platform stats card
     private var summaryCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
@@ -627,7 +627,7 @@ private struct AllIssueRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            // 썸네일
+            // Thumbnail
             ZStack {
                 RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusSmall)
                     .fill(issue.category.markerColor.opacity(0.12))
@@ -717,7 +717,7 @@ struct IssueDetailView: View {
                     // 상단 사진 영역
                     photoHeader
 
-                    // 정보 영역
+                    // Info 영역
                     VStack(spacing: 12) {
                         infoCard
                         priorityCard
@@ -1110,7 +1110,7 @@ struct IssueSearchSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("닫기") { dismiss() }
+                    Button("Close") { dismiss() }
                         .foregroundStyle(Color.zoominBlue)
                 }
             }
@@ -1138,7 +1138,7 @@ private struct SearchResultRow: View {
                     .foregroundStyle(issue.category.markerColor)
             }
 
-            // 정보
+            // Info
             VStack(alignment: .leading, spacing: 4) {
                 Text(issue.title)
                     .font(ZOOMINFont.bodyBold)

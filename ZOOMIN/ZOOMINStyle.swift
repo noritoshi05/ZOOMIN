@@ -2,45 +2,45 @@ import SwiftUI
 
 // ============================================================
 //  ZOOMINStyle.swift
-//  공용 디자인 시스템 — 모든 멤버가 이 파일을 공유하세요
-//  PINGO 마스코트 + 디자인 가이드 기반
+//  Shared Design System — All team members use this file
+//  Based on PINGO mascot + design guide
 // ============================================================
 
-// MARK: - 브랜드 컬러
+// MARK: - Brand Colors
 extension Color {
-    // 메인 브랜드
-    static let zoominBlue      = Color(hex: "#2B7FE0")   // 메인 파란색 (ZOOMIN 로고)
-    static let zoominBlueDark  = Color(hex: "#1A5DB5")   // 진한 파란색 (버튼 탭)
-    static let zoominBlueLight = Color(hex: "#E8F1FB")   // 연한 파란색 (배경 강조)
+    // Main brand
+    static let zoominBlue      = Color(hex: "#2B7FE0")   // Main blue (ZOOMIN logo)
+    static let zoominBlueDark  = Color(hex: "#1A5DB5")   // Dark blue (button tap)
+    static let zoominBlueLight = Color(hex: "#E8F1FB")   // Light blue (background accent)
 
-    // 상태 컬러 (Status Badge)
-    static let statusReceived   = Color(hex: "#9E9E9E")  // 회색   - Received
-    static let statusReviewing  = Color(hex: "#2B7FE0")  // 파란색 - Reviewing
-    static let statusInProgress = Color(hex: "#FF8C00")  // 주황색 - In Progress
-    static let statusCompleted  = Color(hex: "#34C759")  // 초록색 - Completed
+    // Status colors (Status Badge)
+    static let statusReceived   = Color(hex: "#9E9E9E")  // Gray   - Received
+    static let statusReviewing  = Color(hex: "#2B7FE0")  // Blue   - Reviewing
+    static let statusInProgress = Color(hex: "#FF8C00")  // Orange - In Progress
+    static let statusCompleted  = Color(hex: "#34C759")  // Green  - Completed
 
-    // 위험도 컬러 (Risk Level)
-    static let riskLow      = Color(hex: "#34C759")      // 초록
-    static let riskMedium   = Color(hex: "#FFD60A")      // 노랑
-    static let riskHigh     = Color(hex: "#FF8C00")      // 주황
-    static let riskCritical = Color(hex: "#FF3B30")      // 빨강
+    // Risk level colors
+    static let riskLow      = Color(hex: "#34C759")      // Green
+    static let riskMedium   = Color(hex: "#FFD60A")      // Yellow
+    static let riskHigh     = Color(hex: "#FF8C00")      // Orange
+    static let riskCritical = Color(hex: "#FF3B30")      // Red
 
-    // 리워드 컬러
-    static let rewardGold   = Color(hex: "#FFD60A")      // 포인트/별
-    static let rewardGreen  = Color(hex: "#34C759")      // 배지
+    // Reward colors
+    static let rewardGold   = Color(hex: "#FFD60A")      // Points / star
+    static let rewardGreen  = Color(hex: "#34C759")      // Badge
 
-    // 배경 / 서피스
+    // Background / Surface
     static let surfacePrimary   = Color(hex: "#FFFFFF")
     static let surfaceSecondary = Color(hex: "#F5F7FA")
     static let surfaceTertiary  = Color(hex: "#EEF2F8")
 
-    // 텍스트
+    // Text
     static let textPrimary   = Color(hex: "#1A1A2E")
     static let textSecondary = Color(hex: "#6B7280")
     static let textTertiary  = Color(hex: "#9CA3AF")
 }
 
-// Hex 컬러 초기화
+// Hex color initializer
 extension Color {
     init(hex: String) {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
@@ -65,15 +65,15 @@ extension Color {
     }
 }
 
-// MARK: - 타이포그래피
+// MARK: - Typography
 struct ZOOMINFont {
-    // 제목
+    // Headings
     static let largeTitle  = Font.system(size: 28, weight: .bold, design: .rounded)
     static let title1      = Font.system(size: 22, weight: .bold, design: .rounded)
     static let title2      = Font.system(size: 18, weight: .semibold, design: .rounded)
     static let title3      = Font.system(size: 16, weight: .semibold, design: .rounded)
 
-    // 본문
+    // Body
     static let body        = Font.system(size: 15, weight: .regular, design: .rounded)
     static let bodyBold    = Font.system(size: 15, weight: .semibold, design: .rounded)
     static let caption     = Font.system(size: 13, weight: .regular, design: .rounded)
@@ -81,7 +81,7 @@ struct ZOOMINFont {
     static let micro       = Font.system(size: 11, weight: .medium, design: .rounded)
 }
 
-// MARK: - 레이아웃 상수
+// MARK: - Layout Constants
 struct ZOOMINLayout {
     static let cornerRadiusSmall:  CGFloat = 8
     static let cornerRadiusMedium: CGFloat = 12
@@ -97,7 +97,7 @@ struct ZOOMINLayout {
     static let shadowY: CGFloat = 4
 }
 
-// MARK: - Status Badge 컴포넌트 (멤버 전원 공통 사용)
+// MARK: - Status Badge Component (shared by all members)
 struct ZOOMINStatusBadge: View {
     let status: IssueStatus
 
@@ -177,22 +177,22 @@ struct ZOOMINRiskBadge: View {
     }
 }
 
-// MARK: - Category 컬러 & 아이콘 (지도 마커 등)
+// MARK: - Category Color & Icon (map markers etc.)
 extension IssueCategory {
     var markerColor: Color {
         switch self {
-        case .roadDamage:             return Color(hex: "#FF3B30") // 빨강 - 도로 파손
-        case .sidewalkDamage:         return Color(hex: "#FF8C00") // 주황 - 보도 파손
-        case .streetlightFailure:     return Color(hex: "#FFD60A") // 노랑 - 가로등
-        case .drainageBlocked:        return Color(hex: "#2B7FE0") // 파랑 - 배수
-        case .constructionSafetyRisk: return Color(hex: "#AF52DE") // 보라 - 공사 위험
-        case .bridgeInfraRisk:        return Color(hex: "#FF6B35") // 진주황 - 교량
-        case .other:                  return Color(hex: "#8E8E93") // 회색 - 기타
+        case .roadDamage:             return Color(hex: "#FF3B30") // Red    - Road Damage
+        case .sidewalkDamage:         return Color(hex: "#FF8C00") // Orange - Sidewalk Damage
+        case .streetlightFailure:     return Color(hex: "#FFD60A") // Yellow - Streetlight
+        case .drainageBlocked:        return Color(hex: "#2B7FE0") // Blue   - Drainage
+        case .constructionSafetyRisk: return Color(hex: "#AF52DE") // Purple - Construction Risk
+        case .bridgeInfraRisk:        return Color(hex: "#FF6B35") // Dark Orange - Bridge
+        case .other:                  return Color(hex: "#8E8E93") // Gray   - Other
         }
     }
 }
 
-// MARK: - 메인 버튼 스타일
+// MARK: - Primary Button Style
 struct ZOOMINPrimaryButton: ViewModifier {
     func body(content: Content) -> some View {
         content
@@ -238,7 +238,7 @@ extension View {
     }
 }
 
-// MARK: - 카드 스타일
+// MARK: - Card Style
 struct ZOOMINCard: ViewModifier {
     var padding: CGFloat = ZOOMINLayout.paddingMedium
 
@@ -259,21 +259,21 @@ extension View {
     }
 }
 
-// MARK: - PINGO 마스코트 헬퍼 뷰
-// 실제 이미지 파일명: pingo_default, pingo_search, pingo_thinking,
-//                   pingo_working, pingo_done, pingo_thanks
-// Assets에 이미지 추가 후 사용하세요
+// MARK: - PINGO Mascot Helper View
+// Image filenames: pingo_default, pingo_search, pingo_thinking,
+//                 pingo_working, pingo_done, pingo_thanks
+// Add images to Assets before use
 struct PingoView: View {
     let mood: PingoMood
     var size: CGFloat = 80
 
     enum PingoMood: String {
-        case `default` = "pingo_default"   // 기본
-        case search    = "pingo_search"    // 조사 중
-        case thinking  = "pingo_thinking"  // 고민 중
-        case working   = "pingo_working"   // 처리 중
-        case done      = "pingo_done"      // 완료
-        case thanks    = "pingo_thanks"    // 감사
+        case `default` = "pingo_default"
+        case search    = "pingo_search"
+        case thinking  = "pingo_thinking"
+        case working   = "pingo_working"
+        case done      = "pingo_done"
+        case thanks    = "pingo_thanks"
 
         var fallbackSymbol: String {
             switch self {
@@ -294,7 +294,6 @@ struct PingoView: View {
                     .resizable()
                     .scaledToFit()
             } else {
-                // 이미지 없을 때 임시 SF Symbol
                 Image(systemName: mood.fallbackSymbol)
                     .resizable()
                     .scaledToFit()
@@ -305,7 +304,7 @@ struct PingoView: View {
     }
 }
 
-// MARK: - 빈 상태 뷰 (PINGO 활용)
+// MARK: - Empty State View (using PINGO)
 struct ZOOMINEmptyStateView: View {
     let mood: PingoView.PingoMood
     let title: String
@@ -326,9 +325,9 @@ struct ZOOMINEmptyStateView: View {
     }
 }
 
-// MARK: - Priority Score 게이지 바
+// MARK: - Priority Score Gauge Bar
 struct ZOOMINPriorityBar: View {
-    let score: Double   // 최대 18점 (5+5+5+3)
+    let score: Double   // Max 18 points (5+5+5+3)
     let maxScore: Double = 18
 
     var fillColor: Color {
@@ -371,7 +370,7 @@ struct ZOOMINPriorityBar: View {
     }
 }
 
-// MARK: - 포인트 표시 뷰
+// MARK: - Points Badge
 struct ZOOMINPointsBadge: View {
     let points: Int
 
@@ -391,7 +390,7 @@ struct ZOOMINPointsBadge: View {
     }
 }
 
-// MARK: - 네비게이션 바 스타일
+// MARK: - Navigation Bar Style
 struct ZOOMINNavigationStyle: ViewModifier {
     func body(content: Content) -> some View {
         content

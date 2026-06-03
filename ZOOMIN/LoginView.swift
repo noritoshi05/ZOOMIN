@@ -1,18 +1,18 @@
 // LoginView.swift
-// ZOOMIN — Member 4 담당
-// 역할: 로그인 화면 / 일반사용자 vs 관리자 역할 분리
+// ZOOMIN — Member 4
+// Role: Login screen / User role separation (Resident vs Admin)
 
 import SwiftUI
 import Combine
 
-// MARK: - 사용자 역할
+// MARK: - User Role
 
 enum UserRole {
-    case resident   // 일반 주민
-    case admin      // 관리자
+    case resident   // General resident
+    case admin      // Administrator
 }
 
-// MARK: - 앱 전체 세션 관리
+// MARK: - App Session Manager
 
 class AppSession: ObservableObject {
     @Published var isLoggedIn: Bool = false
@@ -124,7 +124,7 @@ struct LoginView: View {
                 .font(ZOOMINFont.largeTitle)
                 .foregroundColor(.textPrimary)
 
-            Text("우리 동네 시설물 신고 플랫폼")
+            Text("Urban Infrastructure Report Platform")
                 .font(ZOOMINFont.caption)
                 .foregroundColor(.textSecondary)
         }
@@ -134,7 +134,7 @@ struct LoginView: View {
 
     private var roleSelectorSection: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("로그인 유형 선택")
+            Text("Select Login Type")
                 .font(ZOOMINFont.captionBold)
                 .foregroundColor(.textSecondary)
                 .padding(.horizontal, 4)
@@ -142,8 +142,8 @@ struct LoginView: View {
             HStack(spacing: 12) {
                 RoleCard(
                     icon: "person.fill",
-                    title: "일반 주민",
-                    subtitle: "신고 · 지도 · 포인트",
+                    title: "Resident",
+                    subtitle: "Report · Map · Points",
                     isSelected: selectedRole == .resident,
                     color: .zoominBlue
                 ) {
@@ -152,8 +152,8 @@ struct LoginView: View {
 
                 RoleCard(
                     icon: "person.badge.shield.checkmark.fill",
-                    title: "관리자",
-                    subtitle: "신고 처리 · 상태 변경",
+                    title: "Admin",
+                    subtitle: "Manage Reports · Update Status",
                     isSelected: selectedRole == .admin,
                     color: .riskHigh
                 ) {
@@ -167,7 +167,7 @@ struct LoginView: View {
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(selectedRole == .admin ? "관리자 이름" : "닉네임")
+            Text(selectedRole == .admin ? "Admin Name" : "Nickname")
                 .font(ZOOMINFont.captionBold)
                 .foregroundColor(.textSecondary)
                 .padding(.horizontal, 4)
@@ -177,7 +177,7 @@ struct LoginView: View {
                     .foregroundColor(.zoominBlue)
                     .font(.system(size: 16))
                 TextField(
-                    selectedRole == .admin ? "담당자 이름 입력" : "닉네임 입력",
+                    selectedRole == .admin ? "Enter admin name" : "Enter nickname",
                     text: $name
                 )
                 .font(ZOOMINFont.body)
@@ -198,7 +198,7 @@ struct LoginView: View {
 
     private var adminCodeSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("관리자 코드")
+            Text("Admin Code")
                 .font(ZOOMINFont.captionBold)
                 .foregroundColor(.textSecondary)
                 .padding(.horizontal, 4)
@@ -207,7 +207,7 @@ struct LoginView: View {
                 Image(systemName: "lock.fill")
                     .foregroundColor(.riskHigh)
                     .font(.system(size: 16))
-                SecureField("관리자 코드 입력", text: $adminCode)
+                SecureField("Enter admin code", text: $adminCode)
                     .font(ZOOMINFont.body)
                     .foregroundColor(.textPrimary)
                     .autocorrectionDisabled()
@@ -227,7 +227,7 @@ struct LoginView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 11))
-                    Text("관리자 코드가 올바르지 않습니다")
+                    Text("Invalid admin code")
                         .font(ZOOMINFont.micro)
                 }
                 .foregroundColor(.riskCritical)
@@ -238,7 +238,7 @@ struct LoginView: View {
             HStack(spacing: 4) {
                 Image(systemName: "info.circle")
                     .font(.system(size: 11))
-                Text("관리자 코드는 팀장에게 문의하세요")
+                Text("Contact your team leader for the admin code")
                     .font(ZOOMINFont.micro)
             }
             .foregroundColor(.textTertiary)
@@ -256,7 +256,7 @@ struct LoginView: View {
                 Image(systemName: selectedRole == .admin
                       ? "person.badge.shield.checkmark.fill"
                       : "person.fill")
-                Text(selectedRole == .admin ? "관리자로 시작하기" : "주민으로 시작하기")
+                Text(selectedRole == .admin ? "Start as Admin" : "Start as Resident")
                     .font(ZOOMINFont.bodyBold)
             }
             .foregroundColor(.white)
@@ -280,7 +280,7 @@ struct LoginView: View {
     // MARK: - 하단 안내
 
     private var footerNote: some View {
-        Text("본 앱은 팀 프로젝트 프로토타입입니다")
+        Text("This app is a team project prototype")
             .font(ZOOMINFont.micro)
             .foregroundColor(.textTertiary)
     }

@@ -44,7 +44,7 @@ struct StatusUpdateView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "checkmark.seal.fill")
                                     .foregroundColor(.statusCompleted)
-                                Text("완료 보고서가 이미 작성되었습니다")
+                                Text("Completion report already submitted")
                                     .font(ZOOMINFont.captionBold)
                                     .foregroundColor(.statusCompleted)
                             }
@@ -62,11 +62,11 @@ struct StatusUpdateView: View {
                     .padding(.bottom, 32)
                 }
             }
-            .navigationTitle("상태 업데이트")
+            .navigationTitle("Status Update")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("취소") { dismiss() }
+                    Button("Cancel") { dismiss() }
                         .foregroundColor(.textSecondary)
                 }
             }
@@ -74,9 +74,9 @@ struct StatusUpdateView: View {
                 CompletionReportView(issue: issue)
                     .environmentObject(issueStore)
             }
-            .alert("상태를 변경하시겠어요?", isPresented: $confirmUpdate) {
-                Button("변경", role: .destructive) { applyStatusUpdate() }
-                Button("취소", role: .cancel) {}
+            .alert("Change status?", isPresented: $confirmUpdate) {
+                Button("Confirm", role: .destructive) { applyStatusUpdate() }
+                Button("Cancel", role: .cancel) {}
             } message: {
                 Text("'\(issue.status.displayName)' → '\(selectedStatus.displayName)'")
             }
@@ -129,7 +129,7 @@ struct StatusUpdateView: View {
 
     private var statusPickerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("상태 선택")
+            Text("Select Status")
                 .font(ZOOMINFont.title3)
                 .foregroundColor(.textPrimary)
 
@@ -153,7 +153,7 @@ struct StatusUpdateView: View {
                 Image(systemName: "info.circle")
                     .font(.system(size: 11))
                     .foregroundColor(.textTertiary)
-                Text("상태는 순서대로만 변경할 수 있습니다")
+                Text("Status can only be changed in order")
                     .font(ZOOMINFont.micro)
                     .foregroundColor(.textTertiary)
             }
@@ -177,18 +177,18 @@ struct StatusUpdateView: View {
                 Image(systemName: "star.fill")
                     .foregroundColor(.rewardGold)
                     .font(.system(size: 13))
-                Text("상태 변경 시 자동 보상")
+                Text("Auto reward on status change")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.textPrimary)
             }
 
             VStack(alignment: .leading, spacing: 6) {
                 RewardInfoRow(icon: "magnifyingglass",
-                              label: "검토 중으로 변경",
+                              label: "Change to Reviewing",
                               reward: "+10 P",
                               color: .statusReviewing)
                 RewardInfoRow(icon: "checkmark.circle.fill",
-                              label: "완료 처리",
+                              label: "Mark as Completed",
                               reward: "+30 P",
                               color: .statusCompleted)
             }
@@ -204,7 +204,7 @@ struct StatusUpdateView: View {
         } label: {
             HStack {
                 Image(systemName: "doc.text.fill")
-                Text("완료 보고서 작성하기")
+                Text("Write Completion Report")
                     .font(ZOOMINFont.bodyBold)
             }
         }
@@ -227,7 +227,7 @@ struct StatusUpdateView: View {
                         ? "xmark.circle.fill"
                         : "checkmark.circle.fill"
                 )
-                Text(selectedStatus == issue.status ? "변경 없음 (닫기)" : "상태 저장")
+                Text(selectedStatus == issue.status ? "No changes (Close)" : "Save Status")
                     .font(ZOOMINFont.bodyBold)
             }
         }
@@ -273,7 +273,7 @@ private struct StatusOptionRow: View {
                             .font(ZOOMINFont.bodyBold)
                             .foregroundColor(isDisabled ? .textTertiary : .textPrimary)
                         if isCurrent {
-                            Text("현재")
+                            Text("Current")
                                 .font(ZOOMINFont.micro)
                                 .foregroundColor(.zoominBlue)
                                 .padding(.horizontal, 6)
@@ -283,7 +283,7 @@ private struct StatusOptionRow: View {
                         }
                     }
                     if isDisabled {
-                        Text("이전 단계로 되돌릴 수 없습니다")
+                        Text("Cannot revert to a previous stage")
                             .font(ZOOMINFont.micro)
                             .foregroundColor(.textTertiary)
                     }

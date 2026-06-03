@@ -1,7 +1,3 @@
-// MyIssuesView.swift
-// ZOOMIN — Member 4 담당
-// 역할: 내 신고 목록 / 상태 추적 / 완료 보고서 확인 / 보상 포인트 표시
-
 // MyIssuesView.swift — 버그 수정본
 // 버그 1 수정: Support 버튼 Firestore 연동
 // 버그 6 수정: 전체 신고 현황에서 세부 내용으로 이동
@@ -64,9 +60,6 @@ struct MyIssuesView: View {
             .sheet(isPresented: $showReward) {
                 RewardView().environmentObject(issueStore)
             }
-            .onAppear {
-                issueStore.deleteExpiredIssues()
-            }
         }
     }
 
@@ -128,13 +121,6 @@ struct MyIssuesView: View {
                     ForEach(filteredIssues) { issue in
                         MyIssueCard(issue: issue) {
                             selectedIssue = issue
-                        }
-                        .contextMenu {
-                            Button(role: .destructive) {
-                                issueStore.deleteIssue(issueID: issue.id)
-                            } label: {
-                                Label("신고 삭제", systemImage: "trash.fill")
-                            }
                         }
                     }
                 }
@@ -282,9 +268,6 @@ struct MyIssueDetailSheet: View {
             }
             .navigationTitle("신고 상세")
             .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                didSupport = UserDefaults.standard.bool(forKey: "supported_\(issue.id.uuidString)")
-            }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("닫기") { dismiss() }.foregroundColor(.zoominBlue)
@@ -338,7 +321,6 @@ struct MyIssueDetailSheet: View {
                 if !didSupport {
                     issueStore.supportIssue(issueID: currentIssue.id)
                     didSupport = true
-                    UserDefaults.standard.set(true, forKey: "supported_\(issue.id.uuidString)")
                 }
             } label: {
                 HStack(spacing: 6) {

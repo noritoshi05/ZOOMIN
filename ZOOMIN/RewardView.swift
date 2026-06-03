@@ -41,7 +41,7 @@ struct RewardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("닫기") { dismiss() }
+                    Button("Close") { dismiss() }
                         .foregroundColor(.zoominBlue)
                 }
             }
@@ -65,7 +65,7 @@ struct RewardView: View {
 
             // 포인트 수치
             VStack(spacing: 4) {
-                Text("내 포인트")
+                Text("My Points")
                     .font(ZOOMINFont.caption)
                     .foregroundColor(.textSecondary)
                 HStack(alignment: .firstTextBaseline, spacing: 6) {
@@ -83,17 +83,17 @@ struct RewardView: View {
 
             // 신고 건수 요약
             HStack(spacing: 0) {
-                PointStatCell(label: "전체 신고",
+                PointStatCell(label: "Total Reports",
                               value: "\(issueStore.myIssues.count)건",
                               icon: "flag.fill",
                               color: .zoominBlue)
                 Divider().frame(height: 36)
-                PointStatCell(label: "처리 완료",
+                PointStatCell(label: "Completed",
                               value: "\(issueStore.myIssues.filter { $0.status == .completed }.count)건",
                               icon: "checkmark.circle.fill",
                               color: .statusCompleted)
                 Divider().frame(height: 36)
-                PointStatCell(label: "지지 받음",
+                PointStatCell(label: "Times Supported",
                               value: "\(issueStore.myIssues.reduce(0) { $0 + $1.supportCount })회",
                               icon: "hand.thumbsup.fill",
                               color: .riskHigh)
@@ -116,7 +116,7 @@ struct RewardView: View {
 
         return VStack(spacing: 6) {
             HStack {
-                Text(totalPoints >= 300 ? "모든 보상 달성!" : "다음 쿠폰까지")
+                Text(totalPoints >= 300 ? "All rewards unlocked!" : "Until next coupon")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.textSecondary)
                 Spacer()
@@ -165,11 +165,11 @@ struct RewardView: View {
     private var couponSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("쿠폰 보상")
+                Text("Coupon Rewards")
                     .font(ZOOMINFont.title3)
                     .foregroundColor(.textPrimary)
                 Spacer()
-                Text("포인트로 교환 가능")
+                Text("Redeemable with points")
                     .font(ZOOMINFont.micro)
                     .foregroundColor(.textTertiary)
             }
@@ -177,24 +177,24 @@ struct RewardView: View {
             VStack(spacing: 10) {
                 CouponCard(
                     icon: "cup.and.saucer.fill",
-                    title: "동네 카페 쿠폰",
-                    subtitle: "지역 제휴 카페에서 음료 1잔",
+                    title: "Local Cafe Coupon",
+                    subtitle: "1 drink at a local partner cafe",
                     requiredPoints: 100,
                     currentPoints: totalPoints,
                     color: Color(hex: "#A0522D")
                 )
                 CouponCard(
                     icon: "storefront.fill",
-                    title: "동네 마켓 쿠폰",
-                    subtitle: "지역 시장 파트너 가맹점 할인",
+                    title: "Local Market Coupon",
+                    subtitle: "Discount at local market partners",
                     requiredPoints: 200,
                     currentPoints: totalPoints,
                     color: Color(hex: "#2E8B57")
                 )
                 CouponCard(
                     icon: "building.2.fill",
-                    title: "공공시설 이용 할인권",
-                    subtitle: "수영장·체육관 등 공공시설 할인",
+                    title: "Public Facility Discount",
+                    subtitle: "Discount at pools, gyms, and more",
                     requiredPoints: 300,
                     currentPoints: totalPoints,
                     color: .zoominBlue
@@ -206,7 +206,7 @@ struct RewardView: View {
                 Image(systemName: "info.circle")
                     .font(.system(size: 11))
                     .foregroundColor(.textTertiary)
-                Text("허위 신고 방지를 위해 주요 보상은 관리자 검토 완료 후 지급됩니다. 제보 제출만으로는 소량의 포인트만 지급되며, 신고가 처리될수록 보상이 누적됩니다.")
+                Text("To prevent false reports, major rewards require admin review. Submitting a report earns a small amount of points. Points accumulate as reports are processed.")
                     .font(ZOOMINFont.micro)
                     .foregroundColor(.textTertiary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -219,38 +219,38 @@ struct RewardView: View {
 
     private var earnGuideSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("포인트 획득 방법")
+            Text("How to Earn Points")
                 .font(ZOOMINFont.title3)
                 .foregroundColor(.textPrimary)
 
             VStack(spacing: 0) {
                 EarnRow(icon: "flag.fill",
-                        label: "신고 제출",
+                        label: "Submit Report",
                         points: "+10 P",
                         color: .zoominBlue,
                         isLast: false)
                 EarnRow(icon: "camera.fill",
-                        label: "사진 첨부 보너스",
+                        label: "Photo Attachment Bonus",
                         points: "+5 P",
                         color: .zoominBlue,
                         isLast: false)
                 EarnRow(icon: "hand.thumbsup.fill",
-                        label: "다른 신고 지지하기",
+                        label: "Support Other Reports",
                         points: "+2 P",
                         color: .riskMedium,
                         isLast: false)
                 EarnRow(icon: "magnifyingglass",
-                        label: "신고 검토 완료",
+                        label: "Report Reviewed",
                         points: "+10 P",
                         color: .statusReviewing,
                         isLast: false)
                 EarnRow(icon: "checkmark.circle.fill",
-                        label: "신고 처리 완료",
+                        label: "Report Completed",
                         points: "+30 P",
                         color: .statusCompleted,
                         isLast: false)
                 EarnRow(icon: "doc.text.fill",
-                        label: "완료 피드백 수신",
+                        label: "Completion Feedback Received",
                         points: "+5 P",
                         color: .statusCompleted,
                         isLast: true)
@@ -265,12 +265,12 @@ struct RewardView: View {
 
     private var pointsHistorySection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("신고별 포인트 내역")
+            Text("Points by Report")
                 .font(ZOOMINFont.title3)
                 .foregroundColor(.textPrimary)
 
             if issueStore.myIssues.isEmpty {
-                Text("아직 신고 내역이 없습니다")
+                Text("No reports yet")
                     .font(ZOOMINFont.body)
                     .foregroundColor(.textTertiary)
                     .frame(maxWidth: .infinity, alignment: .center)
@@ -350,7 +350,7 @@ private struct CouponCard: View {
             // 포인트 / 잠금
             VStack(alignment: .trailing, spacing: 4) {
                 if isUnlocked {
-                    Text("교환 가능")
+                    Text("Redeemable")
                         .font(ZOOMINFont.captionBold)
                         .foregroundColor(.statusCompleted)
                     Image(systemName: "checkmark.seal.fill")

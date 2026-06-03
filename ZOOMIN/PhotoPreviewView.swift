@@ -3,15 +3,15 @@ import UIKit
 
 // ============================================================
 //  PhotoPreviewView.swift
-//  멤버 2 — Report Form & Camera
+//  Member 2 — Report Form & Camera
 //
-//  사진 1장 워크플로우용 UI 모음.
-//   - PhotoCapturePlaceholder: 사진 없을 때 점선 촬영 영역
-//   - PhotoPreviewView:        촬영된 사진 1장 미리보기 + 삭제/재촬영
+//  UI components for single-photo workflow.
+//   - PhotoCapturePlaceholder: dashed capture area when no photo
+//   - PhotoPreviewView: preview of captured photo + delete/retake
 // ============================================================
 
-// MARK: - 촬영 영역 플레이스홀더 (사진 없을 때)
-/// 디자인 가이드: 점선 테두리 + 카메라 아이콘 + "Tap to take a photo"
+// MARK: - Capture Area Placeholder (no photo)
+/// Design guide: dashed border + camera icon + "Tap to take a photo"
 struct PhotoCapturePlaceholder: View {
     var onTap: () -> Void
 
@@ -38,8 +38,8 @@ struct PhotoCapturePlaceholder: View {
     }
 }
 
-// MARK: - 촬영된 사진 1장 미리보기
-/// 사진이 있을 때 큰 미리보기 + 우상단 삭제(x) + 우하단 재촬영 버튼.
+// MARK: - Single Photo Preview
+/// Full preview with delete (x) top-right and retake button bottom-right.
 struct PhotoPreviewView: View {
     let image: UIImage
     var onRemove: () -> Void
@@ -58,7 +58,7 @@ struct PhotoPreviewView: View {
                         .stroke(Color.zoominBlue.opacity(0.2), lineWidth: 1)
                 )
 
-            // 삭제 버튼
+            // Delete button
             Button(action: onRemove) {
                 Image(systemName: "xmark.circle.fill")
                     .font(.system(size: 24))
@@ -67,7 +67,7 @@ struct PhotoPreviewView: View {
             }
             .padding(8)
 
-            // 재촬영 버튼 (우하단)
+            // Retake button (bottom-right)
             VStack {
                 Spacer()
                 HStack {
@@ -75,7 +75,7 @@ struct PhotoPreviewView: View {
                     Button(action: onRetake) {
                         HStack(spacing: 4) {
                             Image(systemName: "arrow.triangle.2.circlepath.camera.fill")
-                            Text("다시 촬영")
+                            Text("Retake")
                                 .font(ZOOMINFont.captionBold)
                         }
                         .foregroundColor(.white)

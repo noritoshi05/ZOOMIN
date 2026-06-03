@@ -4,8 +4,8 @@
 // 디자인: ZOOMINStyle.swift 기반, zoominBlue 강조
 
 // ContentView.swift
-// ZOOMIN — Member 1 담당 (Member 4가 로그인/역할 분리 추가)
-// 역할: 로그인 → 역할별 탭뷰 진입점
+// ZOOMIN — Member 1 (Member 4 added Login / Role separation)
+// Role: Login → Role-based TabView entry point
 
 import SwiftUI
 import Combine
@@ -106,9 +106,9 @@ struct ProfileView: View {
             .navigationTitle("Profile")
             .navigationBarTitleDisplayMode(.inline)
         }
-        .alert("로그아웃 하시겠어요?", isPresented: $showLogoutConfirm) {
-            Button("로그아웃", role: .destructive) { session.logout() }
-            Button("취소", role: .cancel) {}
+        .alert("Are you sure you want to log out?", isPresented: $showLogoutConfirm) {
+            Button("Log Out", role: .destructive) { session.logout() }
+            Button("Cancel", role: .cancel) {}
         }
     }
 
@@ -132,7 +132,7 @@ struct ProfileView: View {
                 Text(session.userName)
                     .font(ZOOMINFont.title2)
                     .foregroundColor(.textPrimary)
-                Text(session.userRole == .admin ? "관리자" : "일반 주민")
+                Text(session.userRole == .admin ? "Admin" : "Resident")
                     .font(ZOOMINFont.caption)
                     .foregroundColor(.textSecondary)
             }
@@ -144,18 +144,18 @@ struct ProfileView: View {
     // 역할 정보 카드
     private var roleInfoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("이용 가능한 기능")
+            Text("Available Features")
                 .font(ZOOMINFont.title3)
                 .foregroundColor(.textPrimary)
 
             if session.userRole == .resident {
-                FeatureRow(icon: "map.fill",        label: "지도에서 신고 확인",   color: .zoominBlue)
-                FeatureRow(icon: "camera.fill",     label: "시설물 신고하기",      color: .zoominBlue)
-                FeatureRow(icon: "list.bullet.rectangle.fill", label: "내 신고 현황 · 포인트", color: .zoominBlue)
+                FeatureRow(icon: "map.fill",        label: "View reports on map",   color: .zoominBlue)
+                FeatureRow(icon: "camera.fill",     label: "Submit a report",      color: .zoominBlue)
+                FeatureRow(icon: "list.bullet.rectangle.fill", label: "My reports · Points", color: .zoominBlue)
             } else {
-                FeatureRow(icon: "map.fill",                   label: "지도에서 신고 확인",    color: .riskHigh)
-                FeatureRow(icon: "chart.bar.fill",             label: "신고 대시보드",         color: .riskHigh)
-                FeatureRow(icon: "checkmark.seal.fill",        label: "상태 변경 · 완료 보고서", color: .riskHigh)
+                FeatureRow(icon: "map.fill",                   label: "View reports on map",    color: .riskHigh)
+                FeatureRow(icon: "chart.bar.fill",             label: "Report dashboard",         color: .riskHigh)
+                FeatureRow(icon: "checkmark.seal.fill",        label: "Update status · Completion report", color: .riskHigh)
             }
         }
         .zoominCard()
@@ -168,7 +168,7 @@ struct ProfileView: View {
         } label: {
             HStack(spacing: 6) {
                 Image(systemName: "rectangle.portrait.and.arrow.right")
-                Text("로그아웃")
+                Text("Log Out")
                     .font(ZOOMINFont.bodyBold)
             }
             .foregroundColor(.riskCritical)

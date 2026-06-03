@@ -1,9 +1,5 @@
 // IssueStore.swift
 // ZOOMIN - Shared store file
-// ⚠️ 팀 공용 파일: 이 파일은 모든 팀원이 동일하게 사용합니다. 절대 수정하지 마세요.
-
-// IssueStore.swift
-// ZOOMIN - Shared store file
 // Firestore 실시간 연동 버전 (Member 4 수정)
 
 import Foundation
@@ -254,29 +250,5 @@ final class IssueStore: ObservableObject {
 
     var totalRewardPoints: Int {
         myIssues.reduce(0) { $0 + $1.rewardPoints }
-    }
-    
-    // MARK: - 신고 삭제 (내가 직접)
-
-    func deleteIssue(issueID: UUID) {
-        db.collection("issues").document(issueID.uuidString)
-            .delete { error in
-                if let error = error {
-                    print("삭제 오류: \(error.localizedDescription)")
-                }
-            }
-    }
-
-    // MARK: - 완료 후 30일 지난 신고 자동 삭제
-
-    func deleteExpiredIssues() {
-        let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date()) ?? Date()
-        let expired = issues.filter {
-            $0.status == .completed &&
-            ($0.completionDate ?? Date()) < thirtyDaysAgo
-        }
-        for issue in expired {
-            deleteIssue(issueID: issue.id)
-        }
     }
 }

@@ -5,50 +5,50 @@ import Combine
 
 // ============================================================
 //  ReportView.swift
-//  멤버 2 — Report Form & Camera (메인 화면)
+//  Member 2 — Report Form & Camera (Main screen)
 //
-//  책임:
-//   - 사진 1장 첨부 (카메라/앨범)  → IssueStore 의 photoData: Data?
-//   - 카테고리 선택               → IssueCategory
-//   - 위치 (GPS 자동 감지)        → latitude / longitude (필수)
-//   - 설명 입력 (0/300)
-//   - 우선순위 3요소 입력 (각 1~5): 안전위험 / 긴급도 / 공공영향
-//   - 제출 → IssueStore.addIssue(...) 호출
+//  Responsibilities:
+//   - Attach 1 photo (camera/album) → photoData: Data? in IssueStore
+//   - Select category → IssueCategory
+//   - Location (auto GPS) → latitude / longitude (required)
+//   - Description input (0/300)
+//   - Priority 3 factors (each 1~5): Safety Risk / Urgency / Public Impact
+//   - Submit → calls IssueStore.addIssue(...)
 //
-//  연동: @EnvironmentObject var store: IssueStore (ContentView 에서 주입)
-//  디자인: ZOOMINStyle.swift 컴포넌트/모디파이어 사용
+//  Integration: @EnvironmentObject var store: IssueStore (injected from ContentView)
+//  Design: Uses ZOOMINStyle.swift components/modifiers
 // ============================================================
 
 struct ReportView: View {
     @EnvironmentObject private var store: IssueStore
 
-    // 입력 상태
+    // Input state
     @State private var image: UIImage? = nil
     @State private var selectedCategory: IssueCategory? = nil
     @State private var title: String = ""
     @State private var description: String = ""
 
-    // 우선순위 3요소 (각 1~5)
+    // Priority 3 factors (each 1~5)
     @State private var safetyRisk: Int = 3
     @State private var urgency: Int = 3
     @State private var publicImpact: Int = 3
 
-    // 위치
+    // Location
     @StateObject private var locationManager = ReportLocationManager()
 
-    // 사진 소스 선택
+    // Photo source selection
     @State private var showCamera = false
     @State private var showLibrary = false
     @State private var showSourceDialog = false
 
-    // 제출 상태
+    // Submission state
     @State private var isSubmitting = false
     @State private var showSuccess = false
     @State private var errorMessage: String?
 
     private let maxDescription = 300
 
-    // 유효성: 카테고리 + 제목 + 위치 확보 시 제출 가능
+    // Validation: submittable when category + title + location are set
     private var canSubmit: Bool {
         selectedCategory != nil
         && !title.trimmingCharacters(in: .whitespaces).isEmpty
@@ -75,7 +75,7 @@ struct ReportView: View {
                     .padding(.top, ZOOMINLayout.paddingMedium)
                 }
 
-                // 하단 고정 제출 버튼
+                // Fixed bottom submit button
                 VStack {
                     Spacer()
                     submitButton
@@ -95,10 +95,10 @@ struct ReportView: View {
                 }
             }
             .onAppear { locationManager.request() }
-            .confirmationDialog("사진 추가", isPresented: $showSourceDialog, titleVisibility: .visible) {
-                Button("카메라로 촬영") { showCamera = true }
-                Button("앨범에서 선택") { showLibrary = true }
-                Button("취소", role: .cancel) {}
+            .confirmationDialog("Add Photo", isPresented: $showSourceDialog, titleVisibility: .visible) {
+                Button("Take Photo") { showCamera = true }
+                Button("Choose from Library") { showLibrary = true }
+                Button("Cancel", role: .cancel) {}
             }
             .fullScreenCover(isPresented: $showCamera) {
                 CameraPicker { picked in image = picked }
@@ -107,20 +107,20 @@ struct ReportView: View {
             .sheet(isPresented: $showLibrary) {
                 PhotoLibraryPicker { picked in image = picked }
             }
-            .alert("제출 완료", isPresented: $showSuccess) {
-                Button("확인", role: .cancel) {}
+            .alert("Submitted!", isPresented: $showSuccess) {
+                Button("OK", role: .cancel) {}
             } message: {
-                Text("제보가 접수되었어요. 함께해 주셔서 감사합니다!")
+                Text("Your report has been received. Thank you for your contribution!")
             }
-            .alert("제출 실패", isPresented: .constant(errorMessage != nil)) {
-                Button("확인", role: .cancel) { errorMessage = nil }
+            .alert("Submission Failed", isPresented: .constant(errorMessage != nil)) {
+                Button("OK", role: .cancel) { errorMessage = nil }
             } message: {
                 Text(errorMessage ?? "")
             }
         }
     }
 
-    // MARK: 사진 섹션
+    // MARK: Photo Section
     private var photoSection: some View {
         VStack(alignment: .leading, spacing: ZOOMINLayout.paddingSmall) {
             sectionLabel("Photo")
@@ -133,17 +133,17 @@ struct ReportView: View {
             } else {
                 PhotoCapturePlaceholder { showSourceDialog = true }
             }
-            Text("사진 첨부 시 +5 포인트")
+            Text("+5 points for attaching a photo")
                 .font(ZOOMINFont.micro)
                 .foregroundColor(.textTertiary)
         }
     }
 
-    // MARK: 제목 섹션
+    // MARK: Title Section
     private var titleSection: some View {
         VStack(alignment: .leading, spacing: ZOOMINLayout.paddingSmall) {
             sectionLabel("Title")
-            TextField("제목을 입력하세요", text: $title)
+            TextField("Enter title", text: $title)
                 .font(ZOOMINFont.body)
                 .foregroundColor(.textPrimary)
                 .padding(.horizontal, ZOOMINLayout.paddingMedium)
@@ -157,7 +157,7 @@ struct ReportView: View {
         }
     }
 
-    // MARK: 카테고리 섹션
+    // MARK: Category Section
     private var categorySection: some View {
         VStack(alignment: .leading, spacing: ZOOMINLayout.paddingSmall) {
             sectionLabel("Category")
@@ -200,7 +200,7 @@ struct ReportView: View {
         }
     }
 
-    // MARK: 위치 섹션 (GPS 자동 감지)
+    // MARK: Location Section (Auto GPS)
     private var locationSection: some View {
         VStack(alignment: .leading, spacing: ZOOMINLayout.paddingSmall) {
             sectionLabel("Location")
@@ -210,7 +210,7 @@ struct ReportView: View {
                     .foregroundColor(locationManager.coordinate != nil ? .textPrimary : .textTertiary)
                 Spacer()
                 if locationManager.coordinate == nil {
-                    Button("재시도") { locationManager.request() }
+                    Button("Retry") { locationManager.request() }
                         .font(ZOOMINFont.captionBold)
                         .foregroundColor(.zoominBlue)
                 } else {
@@ -225,13 +225,13 @@ struct ReportView: View {
         }
     }
 
-    // MARK: 설명 섹션 (0/300)
+    // MARK: Description Section (0/300)
     private var descriptionSection: some View {
         VStack(alignment: .leading, spacing: ZOOMINLayout.paddingSmall) {
             sectionLabel("Description")
             ZStack(alignment: .topLeading) {
                 if description.isEmpty {
-                    Text("문제를 설명해주세요...")
+                    Text("Describe the issue...")
                         .font(ZOOMINFont.body)
                         .foregroundColor(.textTertiary)
                         .padding(.horizontal, ZOOMINLayout.paddingMedium)
@@ -266,18 +266,18 @@ struct ReportView: View {
         }
     }
 
-    // MARK: 우선순위 3요소 섹션
+    // MARK: Priority Factors Section
     private var prioritySection: some View {
         VStack(alignment: .leading, spacing: ZOOMINLayout.paddingMedium) {
-            sectionLabel("위험도 평가")
-            priorityRow(title: "안전 위험도", systemImage: "exclamationmark.shield.fill", value: $safetyRisk)
-            priorityRow(title: "긴급도", systemImage: "clock.fill", value: $urgency)
-            priorityRow(title: "공공 영향도", systemImage: "person.3.fill", value: $publicImpact)
+            sectionLabel("Risk Assessment")
+            priorityRow(title: "Safety Risk", systemImage: "exclamationmark.shield.fill", value: $safetyRisk)
+            priorityRow(title: "Urgency", systemImage: "clock.fill", value: $urgency)
+            priorityRow(title: "Public Impact", systemImage: "person.3.fill", value: $publicImpact)
 
-            // 예상 우선순위 점수 미리보기 (지지점수 0 가정)
+            // Estimated priority score preview (support score assumed 0)
             let preview = safetyRisk + urgency + publicImpact
             HStack {
-                Text("예상 우선순위")
+                Text("Estimated Priority")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.textSecondary)
                 Spacer()
@@ -331,7 +331,7 @@ struct ReportView: View {
         }
     }
 
-    // MARK: 제출 버튼
+    // MARK: Submit Button
     private var submitButton: some View {
         Button {
             submit()
@@ -343,7 +343,7 @@ struct ReportView: View {
         .disabled(!canSubmit)
     }
 
-    // MARK: - 헬퍼
+    // MARK: - Helpers
     private func sectionLabel(_ text: String) -> some View {
         Text(text)
             .font(ZOOMINFont.title3)
@@ -359,7 +359,7 @@ struct ReportView: View {
         let photoData = image?.jpegDataForUpload()
         let trimmedTitle = title.trimmingCharacters(in: .whitespacesAndNewlines)
 
-        // 공용 스토어에 추가 (메인 스레드)
+        // Add to shared store (main thread)
         store.addIssue(
             title: trimmedTitle,
             category: category,
@@ -390,12 +390,12 @@ struct ReportView: View {
 
 // ============================================================
 //  ReportLocationManager
-//  제보 위치 자동 감지. 권한 요청 + 1회 위치 획득.
-//  ⚠️ Info.plist 에 NSLocationWhenInUseUsageDescription 필요.
+//  Auto-detects report location. Requests permission + obtains location once.
+//  ⚠️ NSLocationWhenInUseUsageDescription required in Info.plist.
 // ============================================================
 final class ReportLocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     @Published var coordinate: CLLocationCoordinate2D?
-    @Published var statusText: String = "위치 확인 중..."
+    @Published var statusText: String = "Detecting location..."
 
     private let manager = CLLocationManager()
 
@@ -406,7 +406,7 @@ final class ReportLocationManager: NSObject, ObservableObject, CLLocationManager
     }
 
     func request() {
-        statusText = "위치 확인 중..."
+        statusText = "Detecting location..."
         let status = manager.authorizationStatus
         switch status {
         case .notDetermined:
@@ -414,7 +414,7 @@ final class ReportLocationManager: NSObject, ObservableObject, CLLocationManager
         case .authorizedWhenInUse, .authorizedAlways:
             manager.requestLocation()
         case .denied, .restricted:
-            statusText = "위치 권한이 필요합니다 (설정에서 허용)"
+            statusText = "Location permission required (enable in Settings)"
         @unknown default:
             statusText = "위치를 가져올 수 없습니다"
         }
@@ -425,7 +425,7 @@ final class ReportLocationManager: NSObject, ObservableObject, CLLocationManager
         if status == .authorizedWhenInUse || status == .authorizedAlways {
             manager.requestLocation()
         } else if status == .denied || status == .restricted {
-            statusText = "위치 권한이 필요합니다 (설정에서 허용)"
+            statusText = "Location permission required (enable in Settings)"
         }
     }
 
