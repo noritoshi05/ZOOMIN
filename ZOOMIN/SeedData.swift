@@ -1,6 +1,6 @@
 // SeedData.swift
-// ZOOMIN — 연세대 주변 실제 예시 데이터 Firestore 업로드용
-// 앱 첫 실행 시 Firestore가 비어있으면 자동으로 샘플 데이터 업로드
+// ZOOMIN — Real sample data around Seodaemun-gu for Firestore upload
+// Automatically uploads sample data on first launch if Firestore is empty
 
 import Foundation
 import FirebaseFirestore
@@ -9,11 +9,21 @@ struct SeedData {
 
     static let db = Firestore.firestore()
 
-    // Firestore가 비어있을 때만 샘플 데이터 업로드
+    // Upload sample data only when Firestore is empty
     static func uploadIfEmpty() {
         db.collection("issues").limit(to: 1).getDocuments { snapshot, _ in
             guard let snapshot = snapshot, snapshot.isEmpty else { return }
             uploadSamples()
+        }
+    }
+
+    // Delete all existing and re-upload (call manually if needed)
+    static func resetAndUpload() {
+        db.collection("issues").getDocuments { snapshot, _ in
+            snapshot?.documents.forEach { $0.reference.delete() }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                uploadSamples()
+            }
         }
     }
 
@@ -44,69 +54,69 @@ struct SeedData {
                 .document(issue.id.uuidString)
                 .setData(data)
         }
-        print("✅ 연세대 주변 샘플 데이터 업로드 완료")
+        print("✅ Seodaemun-gu sample data uploaded successfully")
     }
 
-    // MARK: - 연세대 주변 실제 위치 기반 샘플 데이터
+    // MARK: - Sample Data (Seodaemun-gu, Seoul)
 
     static let sampleIssues: [Issue] = [
 
-        // 1. 연세로 보도블록 파손 — 연세대 정문 앞
+        // 1. Road Damage — Yonsei-ro near main gate
         Issue(
-            title: "연세로 정문 앞 보도블록 파손",
-            category: .sidewalkDamage,
-            description: "연세대학교 정문 앞 연세로 보행자 구간에 보도블록 4장이 깨지고 들려 있습니다. 비가 오면 물이 고여 보행 중 미끄러짐 사고가 반복되고 있으며, 특히 등하교 시간대 혼잡 시 낙상 위험이 큽니다. 휠체어·유모차 통행도 불가 상태입니다.",
-            latitude: 37.5645,
-            longitude: 126.9388,
-            supportCount: 18,
-            safetyRisk: 4,
-            urgency: 4,
-            publicImpact: 5,
-            status: .inProgress,
-            rewardPoints: 30,
-            isMyReport: false
-        ),
-
-        // 2. 신촌역 사거리 포트홀 — 신촌로터리
-        Issue(
-            title: "신촌역 사거리 포트홀 3개 발생",
+            title: "Multiple Potholes on Yonsei-ro",
             category: .roadDamage,
-            description: "신촌역 2번 출구 앞 신촌로 사거리 1차선에 지름 25cm 포트홀이 3개 연속 발생했습니다. 출퇴근 시간대 차량 통행량이 매우 많아 타이어 파손 사고가 이미 2건 발생했으며 오토바이 낙차 위험도 높습니다. 야간 식별이 어려워 긴급 보수가 필요합니다.",
-            latitude: 37.5551,
-            longitude: 126.9368,
+            description: "Three potholes, each approximately 30cm in diameter, have formed in lane 1 near Yonsei University main gate on Yonsei-ro. The road surface has been deteriorating since heavy rainfall last week. Two motorcycle near-miss incidents have already been reported. The potholes are especially dangerous at night when visibility is low. Urgent patching is required before further accidents occur.",
+            latitude: 37.5645,
+            longitude: 126.9390,
             supportCount: 24,
             safetyRisk: 5,
             urgency: 5,
             publicImpact: 5,
-            status: .received,
-            rewardPoints: 10,
+            status: .inProgress,
+            rewardPoints: 45,
             isMyReport: false
         ),
 
-        // 3. 백양로 가로등 고장 — 연세대 백양로
+        // 2. Sidewalk Damage — Sinchon Station exit 3
         Issue(
-            title: "백양로 가로등 4개 연속 소등",
-            category: .streetlightFailure,
-            description: "연세대학교 백양로 중앙도서관 구간 가로등 4개가 1주일째 소등 상태입니다. 야간 강의 후 귀가하는 학생들의 시야 확보가 불가능하며 CCTV 화질도 저하되어 있습니다. 최근 인근에서 야간 안전사고가 신고된 바 있어 즉각적인 수리가 필요합니다.",
-            latitude: 37.5652,
-            longitude: 126.9372,
-            supportCount: 31,
+            title: "Cracked Sidewalk Blocks Near Sinchon Station Exit 3",
+            category: .sidewalkDamage,
+            description: "Several sidewalk blocks near Exit 3 of Sinchon Station have cracked and shifted, creating uneven surfaces of up to 4cm. The area sees heavy foot traffic from commuters and university students. Elderly pedestrians and wheelchair users are at particular risk. Water pooling during rain worsens the hazard. The damaged section extends approximately 8 meters.",
+            latitude: 37.5551,
+            longitude: 126.9369,
+            supportCount: 18,
             safetyRisk: 4,
-            urgency: 5,
-            publicImpact: 4,
+            urgency: 4,
+            publicImpact: 5,
             status: .reviewing,
             rewardPoints: 20,
             isMyReport: false
         ),
 
-        // 4. 홍익문화공원 배수구 막힘 — 홍대 인근
+        // 3. Streetlight Failure — Baekyang-ro
         Issue(
-            title: "홍익문화공원 앞 배수구 막힘",
+            title: "4 Consecutive Streetlights Out on Baekyang-ro",
+            category: .streetlightFailure,
+            description: "Four streetlights along Baekyang-ro, between the central library and the science building, have been completely dark for over a week. Students returning from evening classes are unable to see clearly. CCTV camera footage quality in the area has also significantly degraded, raising safety concerns. The affected stretch is approximately 120 meters long and sees heavy pedestrian traffic after 9 PM.",
+            latitude: 37.5653,
+            longitude: 126.9373,
+            supportCount: 31,
+            safetyRisk: 4,
+            urgency: 5,
+            publicImpact: 4,
+            status: .received,
+            rewardPoints: 10,
+            isMyReport: false
+        ),
+
+        // 4. Drainage Blocked — Hongje-cheon riverside path
+        Issue(
+            title: "Blocked Storm Drain Causing Flooding on Hongje-cheon Path",
             category: .drainageBlocked,
-            description: "홍익문화공원 정문 앞 와우산로 배수구가 낙엽과 쓰레기로 완전히 막혀있습니다. 지난 비에 보행로가 침수돼 인근 상가 앞까지 물이 넘쳤습니다. 이번 주 강수 예보가 있어 재침수 위험이 큽니다. 긴급 청소 요청드립니다.",
-            latitude: 37.5519,
-            longitude: 126.9238,
-            supportCount: 9,
+            description: "The storm drain along the Hongje-cheon riverside walking path near Seodaemun Sports Complex is completely clogged with leaves and debris. During last week's rain, the path flooded to a depth of approximately 10cm, making it impassable for cyclists and joggers. Heavy rainfall is forecast again this week. The blockage spans roughly 3 drain grates and requires immediate clearing.",
+            latitude: 37.5712,
+            longitude: 126.9441,
+            supportCount: 12,
             safetyRisk: 3,
             urgency: 5,
             publicImpact: 3,
@@ -115,14 +125,14 @@ struct SeedData {
             isMyReport: false
         ),
 
-        // 5. 연대 정문 공사장 안전망 — 공사 위험
+        // 5. Construction Safety Risk — Sinchon redevelopment site
         Issue(
-            title: "연대 정문 인근 공사장 낙하물 위험",
+            title: "Unsecured Safety Net at Sinchon Redevelopment Construction Site",
             category: .constructionSafetyRisk,
-            description: "연세로 공사구간 외벽 안전망이 일부 탈락해 보행자 머리 위로 낙하물 위험이 있습니다. 안전 고깔과 펜스가 설치돼 있지만 야간에는 식별이 어렵고 보행로가 좁아 통행이 위험합니다. 공사 시간도 소음 기준을 초과하고 있습니다.",
-            latitude: 37.5640,
-            longitude: 126.9382,
-            supportCount: 13,
+            description: "A section of the safety netting at the Sinchon redevelopment construction site on Sinchon-ro has detached from the scaffolding, leaving a 5-meter gap. Loose debris including concrete fragments and wire mesh is visible near the opening. The site borders a busy pedestrian walkway used by thousands of people daily. Workers have also been observed operating without proper fall protection equipment at heights above 10 meters.",
+            latitude: 37.5548,
+            longitude: 126.9362,
+            supportCount: 9,
             safetyRisk: 5,
             urgency: 5,
             publicImpact: 4,
@@ -131,55 +141,119 @@ struct SeedData {
             isMyReport: false
         ),
 
-        // 6. 신촌 고가보도 난간 부식 — 완료 처리된 케이스
+        // 6. Bridge/Infrastructure Risk — Ahyeon overpass
         Issue(
-            title: "신촌 굴다리 난간 부식 및 균열",
+            title: "Severe Railing Corrosion on Ahyeon Overpass",
             category: .bridgeInfraRisk,
-            description: "신촌역 굴다리 난간 용접부에 부식이 심각하고 콘크리트 균열 폭이 3mm 이상입니다. 통행량이 많아 즉각적인 정밀 안전진단이 필요합니다.",
-            latitude: 37.5548,
-            longitude: 126.9362,
-            supportCount: 7,
+            description: "The steel railing on the south side of Ahyeon Overpass shows extensive corrosion at welded joints, with visible rust flaking and a section approximately 2 meters long that wobbles when touched. Concrete cracks on the bridge deck exceed 3mm in width in multiple locations. The overpass was built in the 1980s and may not have received a structural inspection in recent years. Given the high pedestrian volume, immediate inspection is strongly recommended.",
+            latitude: 37.5593,
+            longitude: 126.9598,
+            supportCount: 14,
             safetyRisk: 5,
             urgency: 4,
-            publicImpact: 4,
-            status: .completed,
-            reportDate: Calendar.current.date(byAdding: .day, value: -14, to: Date()) ?? Date(),
-            completionDate: Calendar.current.date(byAdding: .day, value: -3, to: Date()),
-            completionSummary: "정밀 안전진단 완료 후 난간 용접부 전체 재도장 및 균열 에폭시 충전 처리 완료. 향후 6개월 주기 모니터링 예정.",
-            rewardPoints: 55,
-            isMyReport: true
-        ),
-
-        // 7. 이화여대 앞 보도 침하 — 연세대 인근
-        Issue(
-            title: "이화여대 앞 대현동 보도 침하",
-            category: .sidewalkDamage,
-            description: "이화여대 정문 앞 대현동 보도블록이 최대 4cm 침하되어 단차가 생겼습니다. 고령자와 유모차 통행이 잦은 구간으로 낙상 사고 위험이 높습니다.",
-            latitude: 37.5616,
-            longitude: 126.9466,
-            supportCount: 11,
-            safetyRisk: 3,
-            urgency: 3,
             publicImpact: 4,
             status: .reviewing,
             rewardPoints: 20,
             isMyReport: false
         ),
 
-        // 8. 연대 후문 쪽 기타 시설물 파손
+        // 7. Road Damage — Completed case near Ewha Womans University
         Issue(
-            title: "연대 후문 공중화장실 시설 파손",
-            category: .other,
-            description: "연세대학교 후문 인근 공중화장실 출입문 경첩이 파손돼 문이 제대로 닫히지 않습니다. 냉·난방 기능도 작동하지 않아 이용이 불편합니다.",
-            latitude: 37.5672,
-            longitude: 126.9358,
-            supportCount: 5,
-            safetyRisk: 1,
-            urgency: 2,
-            publicImpact: 2,
+            title: "Large Pothole in Intersection Near Ewha Womans University",
+            category: .roadDamage,
+            description: "A pothole approximately 40cm in diameter and 8cm deep appeared at the main intersection in front of Ewha Womans University. The damage caused a tire blowout for one vehicle and was reported by multiple residents. Emergency repair was requested given the high vehicle and pedestrian volume at this location.",
+            latitude: 37.5617,
+            longitude: 126.9468,
+            supportCount: 27,
+            safetyRisk: 5,
+            urgency: 5,
+            publicImpact: 5,
+            status: .completed,
+            reportDate: Calendar.current.date(byAdding: .day, value: -21, to: Date()) ?? Date(),
+            completionDate: Calendar.current.date(byAdding: .day, value: -7, to: Date()),
+            completionSummary: "Emergency asphalt repair completed on June 1. A 1.2m x 1.0m section was excavated and filled with hot-mix asphalt. Road surface restored to safe condition. Follow-up inspection scheduled for 3 months.",
+            rewardPoints: 55,
+            isMyReport: true
+        ),
+
+        // 8. Sidewalk Damage — Yonsei University back gate area
+        Issue(
+            title: "Sunken Sidewalk Near Yonsei University Back Gate",
+            category: .sidewalkDamage,
+            description: "The sidewalk along Yonhui-ro near Yonsei University's back gate has subsided by approximately 5cm, creating a trip hazard. The area is used by many students and residents accessing the university from the north side. The subsidence appears to be caused by soil erosion beneath the pavement. Several elderly residents have reported near-falls at this location.",
+            latitude: 37.5673,
+            longitude: 126.9359,
+            supportCount: 8,
+            safetyRisk: 3,
+            urgency: 3,
+            publicImpact: 3,
             status: .received,
             rewardPoints: 10,
             isMyReport: false
-        )
+        ),
+
+        // 9. Streetlight Failure — Hongdae area
+        Issue(
+            title: "Flickering Streetlight Creating Hazard on Wausan-ro",
+            category: .streetlightFailure,
+            description: "A streetlight on Wausan-ro near Hongik University has been flickering irregularly for two weeks. The intermittent lighting is disorienting for drivers and creates unpredictable shadows for pedestrians crossing the road. The light appears to fail entirely during peak evening hours between 10 PM and midnight, coinciding with the highest foot traffic in the Hongdae entertainment district.",
+            latitude: 37.5520,
+            longitude: 126.9241,
+            supportCount: 16,
+            safetyRisk: 3,
+            urgency: 4,
+            publicImpact: 4,
+            status: .reviewing,
+            rewardPoints: 20,
+            isMyReport: false
+        ),
+
+        // 10. Other — Broken public bench near Seodaemun Independence Park
+        Issue(
+            title: "Broken Bench and Damaged Pavement at Independence Park Entrance",
+            category: .other,
+            description: "A public bench near the main entrance of Seodaemun Independence Park has a broken seat plank with exposed sharp metal edges. Adjacent to the bench, a section of the paved walkway has heaved upward due to tree root growth, creating a tripping hazard approximately 3cm high. The park is visited by many elderly residents and families with young children, making repairs a priority.",
+            latitude: 37.5698,
+            longitude: 126.9598,
+            supportCount: 6,
+            safetyRisk: 2,
+            urgency: 2,
+            publicImpact: 3,
+            status: .received,
+            rewardPoints: 10,
+            isMyReport: false
+        ),
+
+        // 11. Drainage Blocked — Near Seodaemun-gu Office
+        Issue(
+            title: "Overflowing Manhole Cover on Tongil-ro During Rain",
+            category: .drainageBlocked,
+            description: "A manhole cover on Tongil-ro in front of Seodaemun-gu Office overflows and becomes partially dislodged during moderate to heavy rainfall events. The condition has been observed during three separate rain events this month. The dislodged cover poses a serious risk to cyclists and motorcyclists. Sewage odor has also been reported by nearby residents and office workers.",
+            latitude: 37.5791,
+            longitude: 126.9368,
+            supportCount: 19,
+            safetyRisk: 5,
+            urgency: 4,
+            publicImpact: 4,
+            status: .inProgress,
+            rewardPoints: 30,
+            isMyReport: false
+        ),
+
+        // 12. Construction Safety Risk — Near Yeonhui-dong residential area
+        Issue(
+            title: "Construction Noise Exceeding Limits in Yeonhui-dong After 10 PM",
+            category: .constructionSafetyRisk,
+            description: "A residential construction project in Yeonhui-dong has been conducting drilling and pile-driving work after 10 PM on multiple occasions this week, in violation of local noise ordinances. Measured noise levels by a resident reached 78 dB, well above the legal nighttime limit of 50 dB. Multiple households with young children and elderly residents have been unable to sleep. A formal complaint has already been filed with the district office.",
+            latitude: 37.5668,
+            longitude: 126.9302,
+            supportCount: 22,
+            safetyRisk: 2,
+            urgency: 4,
+            publicImpact: 5,
+            status: .reviewing,
+            rewardPoints: 20,
+            isMyReport: false
+        ),
     ]
 }
