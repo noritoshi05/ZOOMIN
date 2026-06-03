@@ -38,8 +38,20 @@ struct StatusUpdateView: View {
                         rewardInfoCard
 
                         // 4. 완료 처리 시 보고서 버튼
-                        if selectedStatus == .completed {
+                        if selectedStatus == .completed && (issue.completionSummary == nil || issue.completionSummary?.isEmpty == true) {
                             completionReportButton
+                        } else if selectedStatus == .completed {
+                            HStack(spacing: 6) {
+                                Image(systemName: "checkmark.seal.fill")
+                                    .foregroundColor(.statusCompleted)
+                                Text("완료 보고서가 이미 작성되었습니다")
+                                    .font(ZOOMINFont.captionBold)
+                                    .foregroundColor(.statusCompleted)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(ZOOMINLayout.paddingMedium)
+                            .background(Color.statusCompleted.opacity(0.08))
+                            .cornerRadius(ZOOMINLayout.cornerRadiusMedium)
                         }
 
                         // 5. 저장 버튼

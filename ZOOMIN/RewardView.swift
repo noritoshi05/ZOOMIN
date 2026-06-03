@@ -1,0 +1,465 @@
+// RewardView.swift
+// ZOOMIN — Member 4 담당
+// 역할: 포인트 현황 / 쿠폰 보상 목록 / 포인트 획득 방법 안내
+
+import SwiftUI
+
+struct RewardView: View {
+
+    @EnvironmentObject var issueStore: IssueStore
+    @Environment(\.dismiss) private var dismiss
+
+    // 쿠폰 교환 가능 여부 (총 포인트 기준)
+    private var totalPoints: Int { issueStore.totalRewardPoints }
+
+    var body: some View {
+        NavigationStack {
+            ZStack {
+                Color.surfaceSecondary.ignoresSafeArea()
+
+                ScrollView {
+                    VStack(spacing: ZOOMINLayout.paddingMedium) {
+
+                        // 1. 포인트 히어로 카드
+                        pointsHeroCard
+
+                        // 2. 쿠폰 보상 목록
+                        couponSection
+
+                        // 3. 포인트 획득 방법
+                        earnGuideSection
+
+                        // 4. 내 포인트 내역
+                        pointsHistorySection
+                    }
+                    .padding(.horizontal, ZOOMINLayout.paddingMedium)
+                    .padding(.top, ZOOMINLayout.paddingMedium)
+                    .padding(.bottom, 40)
+                }
+            }
+            .navigationTitle("Rewards")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("닫기") { dismiss() }
+                        .foregroundColor(.zoominBlue)
+                }
+            }
+        }
+    }
+
+    // MARK: - 1. 포인트 히어로 카드
+
+    private var pointsHeroCard: some View {
+        VStack(spacing: 16) {
+
+            // 코인 아이콘
+            ZStack {
+                Circle()
+                    .fill(Color.rewardGold.opacity(0.15))
+                    .frame(width: 80, height: 80)
+                Image(systemName: "p.circle.fill")
+                    .font(.system(size: 44))
+                    .foregroundColor(.rewardGold)
+            }
+
+            // 포인트 수치
+            VStack(spacing: 4) {
+                Text("내 포인트")
+                    .font(ZOOMINFont.caption)
+                    .foregroundColor(.textSecondary)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    Text("\(totalPoints)")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundColor(.textPrimary)
+                    Text("P")
+                        .font(ZOOMINFont.title2)
+                        .foregroundColor(.textSecondary)
+                }
+            }
+
+            // 다음 쿠폰까지 진행 바
+            nextCouponProgress
+
+            // 신고 건수 요약
+            HStack(spacing: 0) {
+                PointStatCell(label: "전체 신고",
+                              value: "\(issueStore.myIssues.count)건",
+                              icon: "flag.fill",
+                              color: .zoominBlue)
+                Divider().frame(height: 36)
+                PointStatCell(label: "처리 완료",
+                              value: "\(issueStore.myIssues.filter { $0.status == .completed }.count)건",
+                              icon: "checkmark.circle.fill",
+                              color: .statusCompleted)
+                Divider().frame(height: 36)
+                PointStatCell(label: "지지 받음",
+                              value: "\(issueStore.myIssues.reduce(0) { $0 + $1.supportCount })회",
+                              icon: "hand.thumbsup.fill",
+                              color: .riskHigh)
+            }
+            .padding(.vertical, 8)
+            .background(Color.surfaceSecondary)
+            .cornerRadius(ZOOMINLayout.cornerRadiusMedium)
+        }
+        .zoominCard()
+    }
+
+    // 다음 쿠폰까지 진행 바
+    private var nextCouponProgress: some View {
+        let tiers = [100, 200, 300]
+        let nextTier = tiers.first { $0 > totalPoints } ?? 300
+        let prevTier = tiers.last { $0 <= totalPoints } ?? 0
+        let progress = totalPoints >= 300
+            ? 1.0
+            : Double(totalPoints - prevTier) / Double(nextTier - prevTier)
+
+        return VStack(spacing: 6) {
+            HStack {
+                Text(totalPoints >= 300 ? "모든 보상 달성!" : "다음 쿠폰까지")
+                    .font(ZOOMINFont.captionBold)
+                    .foregroundColor(.textSecondary)
+                Spacer()
+                if totalPoints < 300 {
+                    Text("\(nextTier - totalPoints)P 남음")
+                        .font(ZOOMINFont.captionBold)
+                        .foregroundColor(.rewardGold)
+                }
+            }
+
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.surfaceTertiary)
+                        .frame(height: 8)
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(
+                            LinearGradient(
+                                colors: [Color.rewardGold.opacity(0.7), Color.rewardGold],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .frame(width: geo.size.width * CGFloat(min(progress, 1.0)), height: 8)
+                }
+            }
+            .frame(height: 8)
+
+            // 단계별 마커
+            HStack {
+                Text("0")
+                Spacer()
+                Text("100")
+                Spacer()
+                Text("200")
+                Spacer()
+                Text("300")
+            }
+            .font(ZOOMINFont.micro)
+            .foregroundColor(.textTertiary)
+        }
+    }
+
+    // MARK: - 2. 쿠폰 보상 목록
+
+    private var couponSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("쿠폰 보상")
+                    .font(ZOOMINFont.title3)
+                    .foregroundColor(.textPrimary)
+                Spacer()
+                Text("포인트로 교환 가능")
+                    .font(ZOOMINFont.micro)
+                    .foregroundColor(.textTertiary)
+            }
+
+            VStack(spacing: 10) {
+                CouponCard(
+                    icon: "cup.and.saucer.fill",
+                    title: "동네 카페 쿠폰",
+                    subtitle: "지역 제휴 카페에서 음료 1잔",
+                    requiredPoints: 100,
+                    currentPoints: totalPoints,
+                    color: Color(hex: "#A0522D")
+                )
+                CouponCard(
+                    icon: "storefront.fill",
+                    title: "동네 마켓 쿠폰",
+                    subtitle: "지역 시장 파트너 가맹점 할인",
+                    requiredPoints: 200,
+                    currentPoints: totalPoints,
+                    color: Color(hex: "#2E8B57")
+                )
+                CouponCard(
+                    icon: "building.2.fill",
+                    title: "공공시설 이용 할인권",
+                    subtitle: "수영장·체육관 등 공공시설 할인",
+                    requiredPoints: 300,
+                    currentPoints: totalPoints,
+                    color: .zoominBlue
+                )
+            }
+
+            // 안내 문구
+            HStack(alignment: .top, spacing: 6) {
+                Image(systemName: "info.circle")
+                    .font(.system(size: 11))
+                    .foregroundColor(.textTertiary)
+                Text("허위 신고 방지를 위해 주요 보상은 관리자 검토 완료 후 지급됩니다. 제보 제출만으로는 소량의 포인트만 지급되며, 신고가 처리될수록 보상이 누적됩니다.")
+                    .font(ZOOMINFont.micro)
+                    .foregroundColor(.textTertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .zoominCard()
+    }
+
+    // MARK: - 3. 포인트 획득 방법
+
+    private var earnGuideSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("포인트 획득 방법")
+                .font(ZOOMINFont.title3)
+                .foregroundColor(.textPrimary)
+
+            VStack(spacing: 0) {
+                EarnRow(icon: "flag.fill",
+                        label: "신고 제출",
+                        points: "+10 P",
+                        color: .zoominBlue,
+                        isLast: false)
+                EarnRow(icon: "camera.fill",
+                        label: "사진 첨부 보너스",
+                        points: "+5 P",
+                        color: .zoominBlue,
+                        isLast: false)
+                EarnRow(icon: "hand.thumbsup.fill",
+                        label: "다른 신고 지지하기",
+                        points: "+2 P",
+                        color: .riskMedium,
+                        isLast: false)
+                EarnRow(icon: "magnifyingglass",
+                        label: "신고 검토 완료",
+                        points: "+10 P",
+                        color: .statusReviewing,
+                        isLast: false)
+                EarnRow(icon: "checkmark.circle.fill",
+                        label: "신고 처리 완료",
+                        points: "+30 P",
+                        color: .statusCompleted,
+                        isLast: false)
+                EarnRow(icon: "doc.text.fill",
+                        label: "완료 피드백 수신",
+                        points: "+5 P",
+                        color: .statusCompleted,
+                        isLast: true)
+            }
+            .background(Color.surfaceSecondary)
+            .cornerRadius(ZOOMINLayout.cornerRadiusMedium)
+        }
+        .zoominCard()
+    }
+
+    // MARK: - 4. 포인트 내역
+
+    private var pointsHistorySection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("신고별 포인트 내역")
+                .font(ZOOMINFont.title3)
+                .foregroundColor(.textPrimary)
+
+            if issueStore.myIssues.isEmpty {
+                Text("아직 신고 내역이 없습니다")
+                    .font(ZOOMINFont.body)
+                    .foregroundColor(.textTertiary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, ZOOMINLayout.paddingLarge)
+            } else {
+                VStack(spacing: 8) {
+                    ForEach(issueStore.myIssues.sorted { $0.rewardPoints > $1.rewardPoints }) { issue in
+                        PointsHistoryRow(issue: issue)
+                    }
+                }
+            }
+        }
+        .zoominCard()
+    }
+}
+
+// MARK: - 포인트 통계 셀
+
+private struct PointStatCell: View {
+    let label: String
+    let value: String
+    let icon: String
+    let color: Color
+
+    var body: some View {
+        VStack(spacing: 4) {
+            Image(systemName: icon)
+                .font(.system(size: 16))
+                .foregroundColor(color)
+            Text(value)
+                .font(ZOOMINFont.bodyBold)
+                .foregroundColor(.textPrimary)
+            Text(label)
+                .font(ZOOMINFont.micro)
+                .foregroundColor(.textSecondary)
+        }
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - 쿠폰 카드
+
+private struct CouponCard: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let requiredPoints: Int
+    let currentPoints: Int
+    let color: Color
+
+    private var isUnlocked: Bool { currentPoints >= requiredPoints }
+
+    var body: some View {
+        HStack(spacing: 14) {
+            // 아이콘
+            ZStack {
+                RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusMedium)
+                    .fill(isUnlocked ? color.opacity(0.15) : Color.surfaceTertiary)
+                    .frame(width: 52, height: 52)
+                Image(systemName: icon)
+                    .font(.system(size: 22))
+                    .foregroundColor(isUnlocked ? color : .textTertiary)
+            }
+
+            // 텍스트
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(ZOOMINFont.bodyBold)
+                    .foregroundColor(isUnlocked ? .textPrimary : .textTertiary)
+                Text(subtitle)
+                    .font(ZOOMINFont.caption)
+                    .foregroundColor(isUnlocked ? .textSecondary : .textTertiary)
+            }
+
+            Spacer()
+
+            // 포인트 / 잠금
+            VStack(alignment: .trailing, spacing: 4) {
+                if isUnlocked {
+                    Text("교환 가능")
+                        .font(ZOOMINFont.captionBold)
+                        .foregroundColor(.statusCompleted)
+                    Image(systemName: "checkmark.seal.fill")
+                        .foregroundColor(.statusCompleted)
+                        .font(.system(size: 18))
+                } else {
+                    Text("\(requiredPoints) P")
+                        .font(ZOOMINFont.captionBold)
+                        .foregroundColor(.rewardGold)
+                    Image(systemName: "lock.fill")
+                        .foregroundColor(.textTertiary)
+                        .font(.system(size: 16))
+                }
+            }
+        }
+        .padding(ZOOMINLayout.paddingMedium)
+        .background(
+            isUnlocked
+                ? color.opacity(0.06)
+                : Color.surfacePrimary
+        )
+        .cornerRadius(ZOOMINLayout.cornerRadiusLarge)
+        .overlay(
+            RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusLarge)
+                .stroke(
+                    isUnlocked ? color.opacity(0.3) : Color.textTertiary.opacity(0.2),
+                    lineWidth: 1
+                )
+        )
+    }
+}
+
+// MARK: - 포인트 획득 방법 행
+
+private struct EarnRow: View {
+    let icon: String
+    let label: String
+    let points: String
+    let color: Color
+    let isLast: Bool
+
+    var body: some View {
+        VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 15))
+                    .foregroundColor(color)
+                    .frame(width: 24)
+                Text(label)
+                    .font(ZOOMINFont.body)
+                    .foregroundColor(.textPrimary)
+                Spacer()
+                Text(points)
+                    .font(ZOOMINFont.captionBold)
+                    .foregroundColor(.rewardGold)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Color.rewardGold.opacity(0.12))
+                    .cornerRadius(ZOOMINLayout.cornerRadiusSmall)
+            }
+            .padding(.horizontal, ZOOMINLayout.paddingMedium)
+            .padding(.vertical, 12)
+
+            if !isLast {
+                Divider()
+                    .padding(.leading, ZOOMINLayout.paddingMedium + 24 + 12)
+            }
+        }
+    }
+}
+
+// MARK: - 포인트 내역 행
+
+private struct PointsHistoryRow: View {
+    let issue: Issue
+
+    var body: some View {
+        HStack(spacing: 10) {
+            // 카테고리 아이콘
+            ZStack {
+                Color(issue.category.markerColor).opacity(0.10)
+                Image(systemName: issue.category.symbolName)
+                    .font(.system(size: 14))
+                    .foregroundColor(issue.category.markerColor)
+            }
+            .frame(width: 36, height: 36)
+            .clipShape(RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusSmall))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(issue.title)
+                    .font(ZOOMINFont.captionBold)
+                    .foregroundColor(.textPrimary)
+                    .lineLimit(1)
+                ZOOMINStatusBadge(status: issue.status)
+            }
+
+            Spacer()
+
+            ZOOMINPointsBadge(points: issue.rewardPoints)
+        }
+        .padding(ZOOMINLayout.paddingSmall)
+        .background(Color.surfaceSecondary)
+        .cornerRadius(ZOOMINLayout.cornerRadiusMedium)
+    }
+}
+
+// MARK: - Preview
+
+#Preview {
+    RewardView()
+        .environmentObject(IssueStore())
+}

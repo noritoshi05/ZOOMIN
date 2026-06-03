@@ -3,6 +3,7 @@
 // 역할: 로그인 화면 / 일반사용자 vs 관리자 역할 분리
 
 import SwiftUI
+import Combine
 
 // MARK: - 사용자 역할
 
@@ -48,7 +49,7 @@ struct LoginView: View {
     @State private var isAnimating: Bool = false
 
     // 간단한 관리자 코드 (실제 앱에선 서버 인증)
-    private let correctAdminCode = "ZOOMIN2024"
+    private let correctAdminCode = "ZOOMIN2026"
 
     var body: some View {
         ZStack {
