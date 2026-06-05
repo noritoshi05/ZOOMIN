@@ -81,10 +81,3 @@ struct SupportButtonView: View {
         .zoominCard()
     }
 }
-
-#Preview {
-    SupportButtonView(issue: IssueStore().issues[0])
-        .environmentObject(IssueStore())
-        .padding()
-        .background(Color.surfaceSecondary)
-}

@@ -456,11 +456,3 @@ private struct PointsHistoryRow: View {
         .cornerRadius(ZOOMINLayout.cornerRadiusMedium)
     }
 }
-
-// MARK: - Preview
-
-#Preview {
-    RewardView()
-        .environmentObject(IssueStore())
-}
-

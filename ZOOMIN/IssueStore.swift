@@ -5,43 +5,42 @@
 import Foundation
 import Combine
 import FirebaseFirestore
-import FirebaseStorage
 
 final class IssueStore: ObservableObject {
-
+    
     // MARK: - Published State
     @Published var issues: [Issue] = []
-
+    
     // MARK: - Firestore
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
-
+    
     // MARK: - Initialization
     init() {
         startListening()
         SeedData.uploadIfEmpty()
     }
-
+    
     deinit {
         listener?.remove()
     }
-
+    
     // MARK: - Start Real-time Listening
-
+    
     /// Subscribe to Firestore issues collection in real time
     func startListening() {
         listener = db.collection("issues")
             .order(by: "reportDate", descending: true)
             .addSnapshotListener { [weak self] snapshot, error in
                 guard let self = self else { return }
-
+                
                 if let error = error {
                     print("Firestore listening error: \(error.localizedDescription)")
                     return
                 }
-
+                
                 guard let documents = snapshot?.documents else { return }
-
+                
                 DispatchQueue.main.async {
                     self.issues = documents.compactMap { doc in
                         self.issueFromDocument(doc)
@@ -49,12 +48,12 @@ final class IssueStore: ObservableObject {
                 }
             }
     }
-
+    
     // MARK: - Firestore Document → Issue Conversion
-
+    
     private func issueFromDocument(_ doc: QueryDocumentSnapshot) -> Issue? {
         let data = doc.data()
-
+        
         guard
             let title         = data["title"] as? String,
             let categoryRaw   = data["category"] as? String,
@@ -71,23 +70,23 @@ final class IssueStore: ObservableObject {
             let rewardPoints  = data["rewardPoints"] as? Int,
             let isMyReport    = data["isMyReport"] as? Bool
         else { return nil }
-
+        
         let reportDate: Date
         if let ts = data["reportDate"] as? Timestamp {
             reportDate = ts.dateValue()
         } else {
             reportDate = Date()
         }
-
+        
         let completionDate: Date?
         if let ts = data["completionDate"] as? Timestamp {
             completionDate = ts.dateValue()
         } else {
             completionDate = nil
         }
-
+        
         let id = UUID(uuidString: doc.documentID) ?? UUID()
-
+        
         return Issue(
             id:                id,
             title:             title,
@@ -95,8 +94,8 @@ final class IssueStore: ObservableObject {
             description:       description,
             latitude:          latitude,
             longitude:         longitude,
-            photoData:         nil,
-            photoURL:          data["photoURL"] as? String,
+            photoData:         (data["photoData"] as? String).flatMap { Data(base64Encoded: $0) },
+            photoURL:          nil,
             supportCount:      supportCount,
             safetyRisk:        safetyRisk,
             urgency:           urgency,
@@ -109,9 +108,9 @@ final class IssueStore: ObservableObject {
             isMyReport:        isMyReport
         )
     }
-
+    
     // MARK: - Issue → Firestore Dictionary Conversion
-
+    
     private func documentData(from issue: Issue) -> [String: Any] {
         var data: [String: Any] = [
             "title":         issue.title,
@@ -134,132 +133,124 @@ final class IssueStore: ObservableObject {
         if let summary = issue.completionSummary {
             data["completionSummary"] = summary
         }
-        if let photoURL = issue.photoURL {
-            data["photoURL"] = photoURL
+        if let photoData = issue.photoData {
+            data["photoData"] = photoData.base64EncodedString()
         }
         return data
     }
-
+    
     // MARK: - Add Report
-    func addIssue(
-        title: String,
-        category: IssueCategory,
-        description: String,
-        latitude: Double,
-        longitude: Double,
-        photoData: Data? = nil,
-        safetyRisk: Int,
-        urgency: Int,
-        publicImpact: Int
-    ) {
-        let basePoints = 10
-        let photoBonus = photoData != nil ? 5 : 0
-
-        let newIssue = Issue(
-            title:        title,
-            category:     category,
-            description:  description,
-            latitude:     latitude,
-            longitude:    longitude,
-            photoData:    photoData,
-            supportCount: 0,
-            safetyRisk:   safetyRisk,
-            urgency:      urgency,
-            publicImpact: publicImpact,
-            status:       .received,
-            reportDate:   Date(),
-            rewardPoints: basePoints + photoBonus,
-            isMyReport:   true
-        )
-
-        guard let data = photoData else {
-            db.collection("issues").document(newIssue.id.uuidString).setData(documentData(from: newIssue))
-            return
-        }
-
-        let ref = Storage.storage().reference().child("issue_photos/\(newIssue.id.uuidString).jpg")
-        ref.putData(data) { _, error in
-            if let error = error { print("Photo upload error: \(error)"); return }
-            ref.downloadURL { url, _ in
-                var issue = newIssue
-                issue.photoURL = url?.absoluteString
-                self.db.collection("issues").document(issue.id.uuidString).setData(self.documentData(from: issue))
-            }
-        }
-    }
-
-    // MARK: - Support
-
-    func supportIssue(issueID: UUID) {
-        let docRef = db.collection("issues").document(issueID.uuidString)
-        docRef.updateData([
-            "supportCount": FieldValue.increment(Int64(1))
-        ]) { error in
-            if let error = error {
-                print("Support error: \(error.localizedDescription)")
-            }
-        }
-    }
-
-    // MARK: - Status Update (Admin)
-
-    func updateStatus(issueID: UUID, newStatus: IssueStatus) {
-        guard let index = issues.firstIndex(where: { $0.id == issueID }) else { return }
-
-        var updateData: [String: Any] = ["status": newStatus.rawValue]
-
-        var pointsToAdd = 0
-        if newStatus == .completed {
-            updateData["completionDate"] = Timestamp(date: Date())
-            pointsToAdd = 30
-        }
-        if newStatus == .reviewing {
-            pointsToAdd = 10
-        }
-
-        let newPoints = issues[index].rewardPoints + pointsToAdd
-        updateData["rewardPoints"] = newPoints
-
-        db.collection("issues").document(issueID.uuidString)
-            .updateData(updateData) { error in
-                if let error = error {
-                    print("Status update error: \(error.localizedDescription)")
+        func addIssue(
+            title: String,
+            category: IssueCategory,
+            description: String,
+            latitude: Double,
+            longitude: Double,
+            photoData: Data? = nil,
+            safetyRisk: Int,
+            urgency: Int,
+            publicImpact: Int
+        ) {
+            let basePoints = 10
+            let photoBonus = photoData != nil ? 5 : 0
+            
+            let newIssue = Issue(
+                title:        title,
+                category:     category,
+                description:  description,
+                latitude:     latitude,
+                longitude:    longitude,
+                photoData:    photoData,
+                supportCount: 0,
+                safetyRisk:   safetyRisk,
+                urgency:      urgency,
+                publicImpact: publicImpact,
+                status:       .received,
+                reportDate:   Date(),
+                rewardPoints: basePoints + photoBonus,
+                isMyReport:   true
+            )
+            
+            db.collection("issues")
+                .document(newIssue.id.uuidString)
+                .setData(documentData(from: newIssue)) { error in
+                    if let error = error {
+                        print("Add report error: \(error.localizedDescription)")
+                    }
                 }
-            }
-    }
+        }
 
-    // MARK: - Add Completion Report (Admin)
-
-    func addCompletionReport(issueID: UUID, summary: String) {
-        guard let index = issues.firstIndex(where: { $0.id == issueID }) else { return }
-
-        let newPoints = issues[index].rewardPoints + 5
-
-        db.collection("issues").document(issueID.uuidString)
-            .updateData([
-                "completionSummary": summary,
-                "status":            IssueStatus.completed.rawValue,
-                "completionDate":    Timestamp(date: Date()),
-                "rewardPoints":      newPoints
+        // MARK: - Support
+        
+        func supportIssue(issueID: UUID) {
+            let docRef = db.collection("issues").document(issueID.uuidString)
+            docRef.updateData([
+                "supportCount": FieldValue.increment(Int64(1))
             ]) { error in
                 if let error = error {
-                    print("Completion report error: \(error.localizedDescription)")
+                    print("Support error: \(error.localizedDescription)")
                 }
             }
+        }
+        
+        // MARK: - Status Update (Admin)
+        
+        func updateStatus(issueID: UUID, newStatus: IssueStatus) {
+            guard let index = issues.firstIndex(where: { $0.id == issueID }) else { return }
+            
+            var updateData: [String: Any] = ["status": newStatus.rawValue]
+            
+            var pointsToAdd = 0
+            if newStatus == .completed {
+                updateData["completionDate"] = Timestamp(date: Date())
+                pointsToAdd = 30
+            }
+            if newStatus == .reviewing {
+                pointsToAdd = 10
+            }
+            
+            let newPoints = issues[index].rewardPoints + pointsToAdd
+            updateData["rewardPoints"] = newPoints
+            
+            db.collection("issues").document(issueID.uuidString)
+                .updateData(updateData) { error in
+                    if let error = error {
+                        print("Status update error: \(error.localizedDescription)")
+                    }
+                }
+        }
+        
+        // MARK: - Add Completion Report (Admin)
+        
+        func addCompletionReport(issueID: UUID, summary: String) {
+            guard let index = issues.firstIndex(where: { $0.id == issueID }) else { return }
+            
+            let newPoints = issues[index].rewardPoints + 5
+            
+            db.collection("issues").document(issueID.uuidString)
+                .updateData([
+                    "completionSummary": summary,
+                    "status":            IssueStatus.completed.rawValue,
+                    "completionDate":    Timestamp(date: Date()),
+                    "rewardPoints":      newPoints
+                ]) { error in
+                    if let error = error {
+                        print("Completion report error: \(error.localizedDescription)")
+                    }
+                }
+        }
+        
+        // MARK: - Computed
+        
+        var myIssues: [Issue] {
+            issues.filter { $0.isMyReport }
+        }
+        
+        var sortedByPriority: [Issue] {
+            issues.sorted { $0.priorityScore > $1.priorityScore }
+        }
+        
+        var totalRewardPoints: Int {
+            myIssues.reduce(0) { $0 + $1.rewardPoints }
+        }
     }
-
-    // MARK: - Computed
-
-    var myIssues: [Issue] {
-        issues.filter { $0.isMyReport }
-    }
-
-    var sortedByPriority: [Issue] {
-        issues.sorted { $0.priorityScore > $1.priorityScore }
-    }
-
-    var totalRewardPoints: Int {
-        myIssues.reduce(0) { $0 + $1.rewardPoints }
-    }
-}
-
