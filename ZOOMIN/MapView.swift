@@ -287,43 +287,86 @@ struct NearbyIssueCard: View {
     var onDetailTap: () -> Void = {}
 
     var body: some View {
-        HStack(spacing: 12) {
+        HStack(spacing: 10) {
+            // Thumbnail
             ZStack {
                 RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusSmall)
-                    .fill(issue.category.markerColor.opacity(0.12)).frame(width: 56, height: 56)
+                    .fill(issue.category.markerColor.opacity(0.12))
+                    .frame(width: 52, height: 52)
                 if let uiImg = issue.uiImage {
                     Image(uiImage: uiImg).resizable().scaledToFill()
-                        .frame(width: 56, height: 56)
+                        .frame(width: 52, height: 52)
                         .clipShape(RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusSmall))
                 } else {
                     Image(systemName: issue.category.symbolName)
-                        .font(.system(size: 22, weight: .semibold)).foregroundStyle(issue.category.markerColor)
+                        .font(.system(size: 20, weight: .semibold))
+                        .foregroundStyle(issue.category.markerColor)
                 }
             }
-            VStack(alignment: .leading, spacing: 5) {
-                Text(issue.title).font(ZOOMINFont.captionBold).foregroundStyle(Color.textPrimary)
-                    .lineLimit(1).frame(width: 120, alignment: .leading)
-                Text("2.3 km away").font(ZOOMINFont.micro).foregroundStyle(Color.textSecondary)
-                HStack(spacing: 6) { ZOOMINStatusBadge(status: issue.status); ZOOMINRiskBadge(level: issue.safetyRisk) }
+            // Info — expands to fill available width
+            VStack(alignment: .leading, spacing: 4) {
+                Text(issue.title)
+                    .font(ZOOMINFont.captionBold)
+                    .foregroundStyle(Color.textPrimary)
+                    .lineLimit(1)
+                // Status + Risk on one line, each badge uses minimum size
+                HStack(spacing: 4) {
+                    compactStatusBadge(issue.status)
+                    compactRiskBadge(issue.safetyRisk)
+                }
             }
+            // Chevron button — fixed width so it never pushes text
             Button { onDetailTap() } label: {
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .semibold))
+                    .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(isSelected ? Color.zoominBlue : Color.textTertiary)
-                    .padding(8)
+                    .padding(7)
                     .background(isSelected ? Color.zoominBlueLight : Color.clear)
                     .clipShape(Circle())
             }
+            .frame(width: 30)
         }
         .contentShape(Rectangle()).onTapGesture { onTap() }
-        .zoominCard(padding: 12).frame(width: 270)
-        .overlay(RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusLarge).stroke(isSelected ? Color.zoominBlue : Color.clear, lineWidth: 1.5))
+        .zoominCard(padding: 10).frame(width: 260)
+        .overlay(RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusLarge)
+            .stroke(isSelected ? Color.zoominBlue : Color.clear, lineWidth: 1.5))
         .overlay(alignment: .leading) {
             if issue.priorityLevel == .high {
                 RoundedRectangle(cornerRadius: 3).fill(Color.riskCritical).frame(width: 3)
-                    .padding(.vertical, 10).offset(x: -ZOOMINLayout.paddingMedium + 3)
+                    .padding(.vertical, 10).offset(x: -10 + 3)
             }
         }
+    }
+
+    // Compact inline badges to prevent line-wrapping
+    private func compactStatusBadge(_ status: IssueStatus) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: status.symbolName).font(.system(size: 9, weight: .semibold))
+            Text(status.displayName).font(.system(size: 10, weight: .semibold, design: .rounded))
+        }
+        .foregroundColor(status.badgeColor)
+        .padding(.horizontal, 6).padding(.vertical, 3)
+        .background(status.badgeColor.opacity(0.12))
+        .overlay(RoundedRectangle(cornerRadius: 6).stroke(status.badgeColor.opacity(0.35), lineWidth: 1))
+        .cornerRadius(6)
+    }
+
+    private func compactRiskBadge(_ level: Int) -> some View {
+        let label: String
+        let color: Color
+        switch level {
+        case 1: label = "Low";      color = .riskLow
+        case 2: label = "Med";      color = .riskMedium
+        case 3: label = "High";     color = .riskHigh
+        default: label = "Critical"; color = .riskCritical
+        }
+        return HStack(spacing: 3) {
+            Circle().fill(color).frame(width: 5, height: 5)
+            Text(label).font(.system(size: 10, weight: .semibold, design: .rounded)).foregroundColor(color)
+        }
+        .padding(.horizontal, 6).padding(.vertical, 3)
+        .background(color.opacity(0.10))
+        .cornerRadius(6)
     }
 }
 
@@ -642,4 +685,5 @@ private struct SearchResultRow: View {
         }
     }
 }
+
 

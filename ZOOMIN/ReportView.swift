@@ -90,6 +90,19 @@ struct ReportView: View {
             .navigationTitle("Report an Issue")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        resetForm()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 13, weight: .semibold))
+                            Text("Reset")
+                                .font(ZOOMINFont.caption)
+                        }
+                        .foregroundColor(.textSecondary)
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if isSubmitting { ProgressView() }
                 }
@@ -445,4 +458,5 @@ final class ReportLocationManager: NSObject, ObservableObject, CLLocationManager
     ReportView()
         .environmentObject(IssueStore())
 }
+
 

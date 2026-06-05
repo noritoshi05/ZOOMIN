@@ -9,7 +9,9 @@ struct SupportButtonView: View {
     let issue: Issue
     @EnvironmentObject var issueStore: IssueStore
 
-    // Tracks if user already supported in this session
+    // Persist "has supported" across sessions via UserDefaults
+    // Key: "supported_<uuid>" → Bool
+    private var userDefaultsKey: String { "supported_\(issue.id.uuidString)" }
     @State private var hasSupported: Bool = false
     @State private var isAnimating: Bool = false
 
@@ -23,15 +25,16 @@ struct SupportButtonView: View {
                     isAnimating = true
                     hasSupported = true
                 }
-                // Calls IssueStore.supportIssue — increments supportCount by 1
-                // Priority score updates automatically via computed property in Issue.swift
+                // Persist to UserDefaults so user cannot support twice
+                UserDefaults.standard.set(true, forKey: userDefaultsKey)
+                // Calls IssueStore.supportIssue — increments supportCount by 1 in Firestore
                 issueStore.supportIssue(issueID: issue.id)
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                     isAnimating = false
                 }
             } label: {
                 HStack(spacing: 10) {
-                    // Heart icon: red (riskCritical) after support, grey before
+                    // Heart icon: red after support, grey before
                     Image(systemName: hasSupported ? "heart.fill" : "heart")
                         .font(.system(size: 22))
                         .foregroundColor(hasSupported ? Color.riskCritical : Color.textTertiary)
@@ -79,6 +82,10 @@ struct SupportButtonView: View {
             .cornerRadius(ZOOMINLayout.cornerRadiusMedium)
         }
         .zoominCard()
+        // Load persisted state when view appears
+        .onAppear {
+            hasSupported = UserDefaults.standard.bool(forKey: userDefaultsKey)
+        }
     }
 }
 
@@ -88,3 +95,4 @@ struct SupportButtonView: View {
         .padding()
         .background(Color.surfaceSecondary)
 }
+
