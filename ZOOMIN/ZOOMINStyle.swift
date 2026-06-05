@@ -101,22 +101,34 @@ struct ZOOMINLayout {
 struct ZOOMINStatusBadge: View {
     let status: IssueStatus
 
+    // 좁은 카드에서 깨지지 않도록 축약 이름 사용
+    private var shortName: String {
+        switch status {
+        case .received:   return "Received"
+        case .reviewing:  return "Reviewing"
+        case .inProgress: return "In Progress"
+        case .completed:  return "Completed"
+        }
+    }
+
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: status.symbolName)
-                .font(.system(size: 11, weight: .semibold))
-            Text(status.displayName)
-                .font(ZOOMINFont.captionBold)
+                .font(.system(size: 10, weight: .semibold))
+            Text(shortName)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .fixedSize()          // 절대 줄바꿈 금지
         }
         .foregroundColor(status.badgeTextColor)
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
         .background(status.badgeColor.opacity(0.15))
         .overlay(
             RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusSmall)
                 .stroke(status.badgeColor.opacity(0.4), lineWidth: 1)
         )
         .cornerRadius(ZOOMINLayout.cornerRadiusSmall)
+        .lineLimit(1)
     }
 }
 
@@ -375,18 +387,20 @@ struct ZOOMINPointsBadge: View {
     let points: Int
 
     var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: 3) {
             Image(systemName: "p.circle.fill")
                 .foregroundColor(.rewardGold)
-                .font(.system(size: 14))
+                .font(.system(size: 12))
             Text("\(points) P")
-                .font(ZOOMINFont.captionBold)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
                 .foregroundColor(.rewardGold)
+                .fixedSize()          // 줄바꿈 절대 금지
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 5)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 4)
         .background(Color.rewardGold.opacity(0.12))
         .cornerRadius(ZOOMINLayout.cornerRadiusSmall)
+        .lineLimit(1)
     }
 }
 
@@ -403,3 +417,4 @@ extension View {
         self.modifier(ZOOMINNavigationStyle())
     }
 }
+
