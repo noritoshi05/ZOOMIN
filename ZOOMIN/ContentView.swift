@@ -1,7 +1,7 @@
 // ContentView.swift
-// ZOOMIN — Member 1 담당
-// 역할: 4탭 TabView 진입점 + IssueStore EnvironmentObject 주입
-// 디자인: ZOOMINStyle.swift 기반, zoominBlue 강조
+// ZOOMIN — Member 1
+// Role: 4-tab TabView entry point + IssueStore EnvironmentObject injection
+// Design: Based on ZOOMINStyle.swift, zoominBlue accent
 
 // ContentView.swift
 // ZOOMIN — Member 1 (Member 4 added Login / Role separation)
@@ -29,7 +29,7 @@ struct ContentView: View {
     }
 }
 
-// MARK: - 역할별 탭뷰
+// MARK: - Role-based TabView
 
 struct MainTabView: View {
 
@@ -41,31 +41,31 @@ struct MainTabView: View {
     var body: some View {
         TabView(selection: $selectedTab) {
 
-            // ── 탭 1: 지도 (공통) ──────────────────────────────────────
+            // ── Tab 1: Map (common) ──────────────────────────────────────
             MapView()
                 .tabItem { Label("Map", systemImage: "map.fill") }
                 .tag(0)
 
-            // ── 탭 2: 신고하기 (일반 주민만) ──────────────────────────
+            // ── Tab 2: Report (residents only) ──────────────────────────
             if session.userRole == .resident {
                 ReportView()
                     .tabItem { Label("Report", systemImage: "camera.fill") }
                     .tag(1)
 
-                // ── 탭 3: 내 신고 (일반 주민만) ───────────────────────
+                // ── Tab 3: My Issues (residents only) ───────────────────────
                 MyIssuesView()
                     .tabItem { Label("My Issues", systemImage: "list.bullet.rectangle.fill") }
                     .tag(2)
             }
 
-            // ── 탭 3/2: 관리자 대시보드 (관리자만) ────────────────────
+            // ── Tab 3/2: Admin Dashboard (admins only) ────────────────────
             if session.userRole == .admin {
                 AdminDashboardView()
                     .tabItem { Label("Dashboard", systemImage: "chart.bar.fill") }
                     .tag(1)
             }
 
-            // ── 탭 마지막: 내 정보/로그아웃 (공통) ───────────────────
+            // ── Last Tab: Profile / Logout (common) ───────────────────
             ProfileView()
                 .tabItem { Label("Profile", systemImage: "person.circle.fill") }
                 .tag(9)
@@ -74,7 +74,7 @@ struct MainTabView: View {
     }
 }
 
-// MARK: - 프로필 / 로그아웃 뷰
+// MARK: - Profile / Logout View
 
 struct ProfileView: View {
 
@@ -90,13 +90,13 @@ struct ProfileView: View {
                 ScrollView {
                     VStack(spacing: ZOOMINLayout.paddingMedium) {
 
-                        // 프로필 카드
+                        // Profile card
                         profileCard
 
-                        // 역할 정보
+                        // Role info
                         roleInfoCard
 
-                        // 로그아웃 버튼
+                        // Logout button
                         logoutButton
                     }
                     .padding(.horizontal, ZOOMINLayout.paddingMedium)
@@ -112,7 +112,7 @@ struct ProfileView: View {
         }
     }
 
-    // 프로필 카드
+    // Profile card
     private var profileCard: some View {
         HStack(spacing: 16) {
             ZStack {
@@ -141,7 +141,7 @@ struct ProfileView: View {
         .zoominCard()
     }
 
-    // 역할 정보 카드
+    // Role info card
     private var roleInfoCard: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Available Features")
@@ -161,7 +161,7 @@ struct ProfileView: View {
         .zoominCard()
     }
 
-    // 로그아웃 버튼
+    // Logout button
     private var logoutButton: some View {
         Button {
             showLogoutConfirm = true
@@ -184,7 +184,7 @@ struct ProfileView: View {
     }
 }
 
-// MARK: - 기능 소개 행
+// MARK: - Feature Row
 
 private struct FeatureRow: View {
     let icon: String

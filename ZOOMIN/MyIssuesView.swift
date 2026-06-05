@@ -1,7 +1,7 @@
-// MyIssuesView.swift — 버그 수정본
-// 버그 1 수정: Support 버튼 Firestore 연동
-// 버그 6 수정: 전체 신고 현황에서 세부 내용으로 이동
-// 버그 추가: Comment 기능 추가
+// MyIssuesView.swift — Bug Fix Version
+// Bug Fix 1: Support button Firestore integration
+// Bug Fix 6: Navigate to detail from full issue list
+// Added: Comment feature
 
 import SwiftUI
 import Combine
@@ -64,13 +64,13 @@ struct MyIssuesView: View {
     }
 
     private var emptyState: some View {
-        ZOOMINEmptyStateView(mood: .search, title: "아직 신고한 내역이 없어요", message: "주변의 시설물 문제를 발견하면\n신고 탭에서 제보해 보세요!")
+        ZOOMINEmptyStateView(mood: .search, title: "No reports yet", message: "Found an issue nearby?\nReport it in the Report tab!")
     }
 
     private var pointsBanner: some View {
         HStack(spacing: 16) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("내 총 포인트").font(ZOOMINFont.caption).foregroundColor(.zoominBlueLight.opacity(0.8))
+                Text("My Total Points").font(ZOOMINFont.caption).foregroundColor(.zoominBlueLight.opacity(0.8))
                 HStack(alignment: .firstTextBaseline, spacing: 4) {
                     Text("\(issueStore.totalRewardPoints)").font(ZOOMINFont.largeTitle).foregroundColor(.white)
                     Text("P").font(ZOOMINFont.title3).foregroundColor(.white.opacity(0.8))
@@ -78,9 +78,9 @@ struct MyIssuesView: View {
             }
             Spacer()
             HStack(spacing: 20) {
-                BannerStat(label: "전체", value: "\(issueStore.myIssues.count)", color: .white)
-                BannerStat(label: "완료", value: "\(issueStore.myIssues.filter { $0.status == .completed }.count)", color: Color(hex: "#34C759"))
-                BannerStat(label: "진행 중", value: "\(issueStore.myIssues.filter { $0.status != .completed }.count)", color: Color(hex: "#FFD60A"))
+                BannerStat(label: "Total", value: "\(issueStore.myIssues.count)", color: .white)
+                BannerStat(label: "Done", value: "\(issueStore.myIssues.filter { $0.status == .completed }.count)", color: Color(hex: "#34C759"))
+                BannerStat(label: "In Progress", value: "\(issueStore.myIssues.filter { $0.status != .completed }.count)", color: Color(hex: "#FFD60A"))
             }
         }
         .padding(ZOOMINLayout.paddingLarge)
@@ -92,7 +92,7 @@ struct MyIssuesView: View {
     private var filterBar: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                FilterPill(label: "전체 (\(issueStore.myIssues.count))", isSelected: selectedFilter == nil) {
+                FilterPill(label: "All (\(issueStore.myIssues.count))", isSelected: selectedFilter == nil) {
                     withAnimation(.easeInOut(duration: 0.2)) { selectedFilter = nil }
                 }
                 ForEach(IssueStatus.allCases, id: \.self) { status in
@@ -109,12 +109,12 @@ struct MyIssuesView: View {
     private var issueListSection: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("신고 내역").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
+                Text("My Reports").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
                 Spacer()
-                Text("\(filteredIssues.count)건").font(ZOOMINFont.caption).foregroundColor(.textTertiary)
+                Text("\(filteredIssues.count) reports").font(ZOOMINFont.caption).foregroundColor(.textTertiary)
             }
             if filteredIssues.isEmpty {
-                ZOOMINEmptyStateView(mood: .done, title: "해당 신고가 없습니다", message: "선택한 상태의 신고가 없어요")
+                ZOOMINEmptyStateView(mood: .done, title: "No reports found", message: "No reports match the selected status")
                     .frame(maxWidth: .infinity).zoominCard()
             } else {
                 LazyVStack(spacing: 10) {
@@ -161,7 +161,7 @@ struct MyIssueCard: View {
                 if issue.status == .completed {
                     HStack(spacing: 6) {
                         Image(systemName: "checkmark.circle.fill").font(.system(size: 11))
-                        Text("처리 완료되었습니다").font(ZOOMINFont.micro).fontWeight(.semibold)
+                        Text("Issue resolved").font(ZOOMINFont.micro).fontWeight(.semibold)
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -184,7 +184,7 @@ struct MyIssueCard: View {
                             ZOOMINPointsBadge(points: issue.rewardPoints)
                             HStack(spacing: 3) {
                                 Image(systemName: "hand.thumbsup.fill").font(.system(size: 11)).foregroundColor(.zoominBlue.opacity(0.7))
-                                Text("지지 \(issue.supportCount)").font(ZOOMINFont.caption).foregroundColor(.textSecondary)
+                                Text("Support \(issue.supportCount)").font(ZOOMINFont.caption).foregroundColor(.textSecondary)
                             }
                             Spacer()
                             Text(issue.reportDate.formatted(.dateTime.month().day())).font(ZOOMINFont.micro).foregroundColor(.textTertiary)
@@ -228,7 +228,7 @@ struct MyIssueCard: View {
     }
 }
 
-// MARK: - 상세 시트 (버그 1, 6 수정: Support 버튼 연동 + 코멘트 기능)
+// MARK: - Detail Sheet (Bug Fix 1 & 6: Support button + Comment feature)
 
 struct MyIssueDetailSheet: View {
 
@@ -252,10 +252,10 @@ struct MyIssueDetailSheet: View {
                     VStack(spacing: ZOOMINLayout.paddingMedium) {
                         photoSection
                         infoCard
-                        // 버그 1 수정: Support 버튼 Firestore 연동
+                        // Bug Fix 1: Support button Firestore integration
                         supportCard
                         priorityCard
-                        // 버그 추가: 코멘트 기능
+                        // Added: Comment feature
                         commentCard
                         if let summary = currentIssue.completionSummary, !summary.isEmpty {
                             completionCard(summary: summary)
@@ -266,11 +266,11 @@ struct MyIssueDetailSheet: View {
                     .padding(.bottom, 32)
                 }
             }
-            .navigationTitle("신고 상세")
+            .navigationTitle("Issue Detail")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("닫기") { dismiss() }.foregroundColor(.zoominBlue)
+                    Button("Close") { dismiss() }.foregroundColor(.zoominBlue)
                 }
             }
         }
@@ -309,12 +309,12 @@ struct MyIssueDetailSheet: View {
         .zoominCard()
     }
 
-    // 버그 1 수정: Support 버튼
+    // Bug Fix 1: Support button
     private var supportCard: some View {
         HStack(spacing: 12) {
             VStack(alignment: .leading, spacing: 4) {
-                Text("이 신고를 지지하나요?").font(ZOOMINFont.bodyBold).foregroundColor(.textPrimary)
-                Text("지지가 많을수록 우선 처리됩니다").font(ZOOMINFont.caption).foregroundColor(.textSecondary)
+                Text("Support this report?").font(ZOOMINFont.bodyBold).foregroundColor(.textPrimary)
+                Text("More support = higher priority").font(ZOOMINFont.caption).foregroundColor(.textSecondary)
             }
             Spacer()
             Button {
@@ -341,16 +341,16 @@ struct MyIssueDetailSheet: View {
 
     private var priorityCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("우선순위 분석").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
+            Text("Priority Analysis").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
             ZOOMINPriorityBar(score: Double(currentIssue.priorityScore))
             HStack(spacing: 0) {
-                PriorityFactorCell(label: "안전위험", value: currentIssue.safetyRisk, color: .riskCritical)
+                PriorityFactorCell(label: "Safety Risk", value: currentIssue.safetyRisk, color: .riskCritical)
                 Divider().frame(height: 36)
-                PriorityFactorCell(label: "긴급도", value: currentIssue.urgency, color: .riskHigh)
+                PriorityFactorCell(label: "Urgency", value: currentIssue.urgency, color: .riskHigh)
                 Divider().frame(height: 36)
-                PriorityFactorCell(label: "공공영향", value: currentIssue.publicImpact, color: .riskMedium)
+                PriorityFactorCell(label: "Public Impact", value: currentIssue.publicImpact, color: .riskMedium)
                 Divider().frame(height: 36)
-                PriorityFactorCell(label: "지지점수", value: currentIssue.supportScore, color: .zoominBlue)
+                PriorityFactorCell(label: "Support Score", value: currentIssue.supportScore, color: .zoominBlue)
             }
             .padding(.vertical, 8)
             .background(Color.surfaceSecondary)
@@ -359,13 +359,13 @@ struct MyIssueDetailSheet: View {
         .zoominCard()
     }
 
-    // 코멘트 기능
+    // Comment feature
     private var commentCard: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("코멘트").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
+            Text("Comments").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
 
             if comments.isEmpty {
-                Text("아직 코멘트가 없어요").font(ZOOMINFont.caption).foregroundColor(.textTertiary)
+                Text("No comments yet").font(ZOOMINFont.caption).foregroundColor(.textTertiary)
                     .frame(maxWidth: .infinity, alignment: .center).padding(.vertical, 8)
             } else {
                 VStack(alignment: .leading, spacing: 8) {
@@ -382,7 +382,7 @@ struct MyIssueDetailSheet: View {
             }
 
             HStack(spacing: 8) {
-                TextField("코멘트 입력...", text: $commentText)
+                TextField("Write a comment...", text: $commentText)
                     .font(ZOOMINFont.body)
                     .padding(ZOOMINLayout.paddingSmall)
                     .background(Color.surfaceSecondary)
@@ -411,7 +411,7 @@ struct MyIssueDetailSheet: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: "checkmark.seal.fill").foregroundColor(.statusCompleted)
-                Text("처리 완료 보고서").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
+                Text("Completion Report").font(ZOOMINFont.title3).foregroundColor(.textPrimary)
             }
             Text(summary).font(ZOOMINFont.body).foregroundColor(.textSecondary).fixedSize(horizontal: false, vertical: true)
             if let date = currentIssue.completionDate {
@@ -438,3 +438,4 @@ private struct PriorityFactorCell: View {
 #Preview {
     MyIssuesView().environmentObject(IssueStore())
 }
+

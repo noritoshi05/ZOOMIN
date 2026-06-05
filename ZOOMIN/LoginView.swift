@@ -48,12 +48,12 @@ struct LoginView: View {
     @State private var showWrongCode: Bool = false
     @State private var isAnimating: Bool = false
 
-    // 간단한 관리자 코드 (실제 앱에선 서버 인증)
+    // Simple admin code (server auth in production)
     private let correctAdminCode = "ZOOMIN2026"
 
     var body: some View {
         ZStack {
-            // 배경
+            // Background
             LinearGradient(
                 colors: [Color.zoominBlue.opacity(0.08), Color.surfaceSecondary],
                 startPoint: .top,
@@ -64,29 +64,29 @@ struct LoginView: View {
             ScrollView {
                 VStack(spacing: 0) {
 
-                    // 1. 로고 헤더
+                    // 1. Logo header
                     logoSection
 
-                    // 2. 역할 선택
+                    // 2. Role selection
                     roleSelectorSection
                         .padding(.top, 32)
 
-                    // 3. 이름 입력
+                    // 3. Name input
                     nameSection
                         .padding(.top, 20)
 
-                    // 4. 관리자 코드 (관리자 선택 시만)
+                    // 4. Admin code (only when admin is selected)
                     if selectedRole == .admin {
                         adminCodeSection
                             .padding(.top, 16)
                             .transition(.move(edge: .top).combined(with: .opacity))
                     }
 
-                    // 5. 로그인 버튼
+                    // 5. Login button
                     loginButton
                         .padding(.top, 28)
 
-                    // 6. 하단 안내
+                    // 6. Bottom notice
                     footerNote
                         .padding(.top, 16)
                 }
@@ -98,11 +98,11 @@ struct LoginView: View {
         .animation(.easeInOut(duration: 0.25), value: selectedRole)
     }
 
-    // MARK: - 로고 섹션
+    // MARK: - Logo Section
 
     private var logoSection: some View {
         VStack(spacing: 12) {
-            // 앱 아이콘
+            // App icon
             ZStack {
                 Circle()
                     .fill(Color.zoominBlue)
@@ -130,7 +130,7 @@ struct LoginView: View {
         }
     }
 
-    // MARK: - 역할 선택 섹션
+    // MARK: - Role Selection Section
 
     private var roleSelectorSection: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -163,7 +163,7 @@ struct LoginView: View {
         }
     }
 
-    // MARK: - 이름 입력 섹션
+    // MARK: - Name Input Section
 
     private var nameSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -194,7 +194,7 @@ struct LoginView: View {
         }
     }
 
-    // MARK: - 관리자 코드 섹션
+    // MARK: - Admin Code Section
 
     private var adminCodeSection: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -234,7 +234,7 @@ struct LoginView: View {
                 .padding(.horizontal, 4)
             }
 
-            // 힌트
+            // Hint
             HStack(spacing: 4) {
                 Image(systemName: "info.circle")
                     .font(.system(size: 11))
@@ -246,7 +246,7 @@ struct LoginView: View {
         }
     }
 
-    // MARK: - 로그인 버튼
+    // MARK: - Login Button
 
     private var loginButton: some View {
         Button {
@@ -277,7 +277,7 @@ struct LoginView: View {
         .disabled(name.trimmingCharacters(in: .whitespaces).isEmpty)
     }
 
-    // MARK: - 하단 안내
+    // MARK: - Bottom Notice
 
     private var footerNote: some View {
         Text("This app is a team project prototype")
@@ -285,7 +285,7 @@ struct LoginView: View {
             .foregroundColor(.textTertiary)
     }
 
-    // MARK: - 로그인 처리
+    // MARK: - Login Logic
 
     private func handleLogin() {
         let trimmedName = name.trimmingCharacters(in: .whitespaces)
@@ -304,7 +304,7 @@ struct LoginView: View {
     }
 }
 
-// MARK: - 역할 카드
+// MARK: - Role Card
 
 private struct RoleCard: View {
     let icon: String
@@ -358,3 +358,4 @@ private struct RoleCard: View {
     LoginView()
         .environmentObject(AppSession())
 }
+

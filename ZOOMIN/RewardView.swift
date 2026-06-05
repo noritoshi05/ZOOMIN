@@ -1,6 +1,6 @@
 // RewardView.swift
-// ZOOMIN — Member 4 담당
-// 역할: 포인트 현황 / 쿠폰 보상 목록 / 포인트 획득 방법 안내
+// ZOOMIN — Member 4
+// Role: Points status / Coupon reward list / How to earn points
 
 import SwiftUI
 
@@ -9,7 +9,7 @@ struct RewardView: View {
     @EnvironmentObject var issueStore: IssueStore
     @Environment(\.dismiss) private var dismiss
 
-    // 쿠폰 교환 가능 여부 (총 포인트 기준)
+    // Whether coupons are redeemable (based on total points)
     private var totalPoints: Int { issueStore.totalRewardPoints }
 
     var body: some View {
@@ -20,16 +20,16 @@ struct RewardView: View {
                 ScrollView {
                     VStack(spacing: ZOOMINLayout.paddingMedium) {
 
-                        // 1. 포인트 히어로 카드
+                        // 1. Points hero card
                         pointsHeroCard
 
-                        // 2. 쿠폰 보상 목록
+                        // 2. Coupon reward list
                         couponSection
 
-                        // 3. 포인트 획득 방법
+                        // 3. How to earn points
                         earnGuideSection
 
-                        // 4. 내 포인트 내역
+                        // 4. My points history
                         pointsHistorySection
                     }
                     .padding(.horizontal, ZOOMINLayout.paddingMedium)
@@ -48,12 +48,12 @@ struct RewardView: View {
         }
     }
 
-    // MARK: - 1. 포인트 히어로 카드
+    // MARK: - 1. Points Hero Card
 
     private var pointsHeroCard: some View {
         VStack(spacing: 16) {
 
-            // 코인 아이콘
+            // Coin icon
             ZStack {
                 Circle()
                     .fill(Color.rewardGold.opacity(0.15))
@@ -63,7 +63,7 @@ struct RewardView: View {
                     .foregroundColor(.rewardGold)
             }
 
-            // 포인트 수치
+            // Points value
             VStack(spacing: 4) {
                 Text("My Points")
                     .font(ZOOMINFont.caption)
@@ -78,23 +78,23 @@ struct RewardView: View {
                 }
             }
 
-            // 다음 쿠폰까지 진행 바
+            // Progress bar to next coupon
             nextCouponProgress
 
-            // 신고 건수 요약
+            // Report count summary
             HStack(spacing: 0) {
                 PointStatCell(label: "Total Reports",
-                              value: "\(issueStore.myIssues.count)건",
+                              value: "\(issueStore.myIssues.count)",
                               icon: "flag.fill",
                               color: .zoominBlue)
                 Divider().frame(height: 36)
                 PointStatCell(label: "Completed",
-                              value: "\(issueStore.myIssues.filter { $0.status == .completed }.count)건",
+                              value: "\(issueStore.myIssues.filter { $0.status == .completed }.count)",
                               icon: "checkmark.circle.fill",
                               color: .statusCompleted)
                 Divider().frame(height: 36)
                 PointStatCell(label: "Times Supported",
-                              value: "\(issueStore.myIssues.reduce(0) { $0 + $1.supportCount })회",
+                              value: "\(issueStore.myIssues.reduce(0) { $0 + $1.supportCount })",
                               icon: "hand.thumbsup.fill",
                               color: .riskHigh)
             }
@@ -105,7 +105,7 @@ struct RewardView: View {
         .zoominCard()
     }
 
-    // 다음 쿠폰까지 진행 바
+    // Progress bar to next coupon
     private var nextCouponProgress: some View {
         let tiers = [100, 200, 300]
         let nextTier = tiers.first { $0 > totalPoints } ?? 300
@@ -121,7 +121,7 @@ struct RewardView: View {
                     .foregroundColor(.textSecondary)
                 Spacer()
                 if totalPoints < 300 {
-                    Text("\(nextTier - totalPoints)P 남음")
+                    Text("\(nextTier - totalPoints)P left")
                         .font(ZOOMINFont.captionBold)
                         .foregroundColor(.rewardGold)
                 }
@@ -145,7 +145,7 @@ struct RewardView: View {
             }
             .frame(height: 8)
 
-            // 단계별 마커
+            // Stage markers
             HStack {
                 Text("0")
                 Spacer()
@@ -160,7 +160,7 @@ struct RewardView: View {
         }
     }
 
-    // MARK: - 2. 쿠폰 보상 목록
+    // MARK: - 2. Coupon Reward List
 
     private var couponSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -201,7 +201,7 @@ struct RewardView: View {
                 )
             }
 
-            // 안내 문구
+            // Info note
             HStack(alignment: .top, spacing: 6) {
                 Image(systemName: "info.circle")
                     .font(.system(size: 11))
@@ -215,7 +215,7 @@ struct RewardView: View {
         .zoominCard()
     }
 
-    // MARK: - 3. 포인트 획득 방법
+    // MARK: - 3. How to Earn Points
 
     private var earnGuideSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -261,7 +261,7 @@ struct RewardView: View {
         .zoominCard()
     }
 
-    // MARK: - 4. 포인트 내역
+    // MARK: - 4. Points History
 
     private var pointsHistorySection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -287,7 +287,7 @@ struct RewardView: View {
     }
 }
 
-// MARK: - 포인트 통계 셀
+// MARK: - Points Stat Cell
 
 private struct PointStatCell: View {
     let label: String
@@ -311,7 +311,7 @@ private struct PointStatCell: View {
     }
 }
 
-// MARK: - 쿠폰 카드
+// MARK: - Coupon Card
 
 private struct CouponCard: View {
     let icon: String
@@ -325,7 +325,7 @@ private struct CouponCard: View {
 
     var body: some View {
         HStack(spacing: 14) {
-            // 아이콘
+            // Icon
             ZStack {
                 RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusMedium)
                     .fill(isUnlocked ? color.opacity(0.15) : Color.surfaceTertiary)
@@ -335,7 +335,7 @@ private struct CouponCard: View {
                     .foregroundColor(isUnlocked ? color : .textTertiary)
             }
 
-            // 텍스트
+            // Text
             VStack(alignment: .leading, spacing: 3) {
                 Text(title)
                     .font(ZOOMINFont.bodyBold)
@@ -347,7 +347,7 @@ private struct CouponCard: View {
 
             Spacer()
 
-            // 포인트 / 잠금
+            // Points / Lock
             VStack(alignment: .trailing, spacing: 4) {
                 if isUnlocked {
                     Text("Redeemable")
@@ -383,7 +383,7 @@ private struct CouponCard: View {
     }
 }
 
-// MARK: - 포인트 획득 방법 행
+// MARK: - Earn Guide Row
 
 private struct EarnRow: View {
     let icon: String
@@ -422,14 +422,14 @@ private struct EarnRow: View {
     }
 }
 
-// MARK: - 포인트 내역 행
+// MARK: - Points History Row
 
 private struct PointsHistoryRow: View {
     let issue: Issue
 
     var body: some View {
         HStack(spacing: 10) {
-            // 카테고리 아이콘
+            // Category icon
             ZStack {
                 Color(issue.category.markerColor).opacity(0.10)
                 Image(systemName: issue.category.symbolName)
@@ -463,3 +463,4 @@ private struct PointsHistoryRow: View {
     RewardView()
         .environmentObject(IssueStore())
 }
+
