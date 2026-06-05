@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		28247B902FD04CE100DDAC68 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 28247B8F2FD04CE100DDAC68 /* FirebaseFirestore */; };
+		669EA8DE2FD2A113007FAA4D /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 669EA8DD2FD2A113007FAA4D /* FirebaseStorage */; };
 		96517FDA2FC90110008E6324 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 96517FD92FC90110008E6324 /* MapKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -60,6 +61,7 @@
 			files = (
 				96517FDA2FC90110008E6324 /* MapKit.framework in Frameworks */,
 				28247B902FD04CE100DDAC68 /* FirebaseFirestore in Frameworks */,
+				669EA8DE2FD2A113007FAA4D /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,6 +132,7 @@
 			name = ZOOMIN;
 			packageProductDependencies = (
 				28247B8F2FD04CE100DDAC68 /* FirebaseFirestore */,
+				669EA8DD2FD2A113007FAA4D /* FirebaseStorage */,
 			);
 			productName = ZOOMIN;
 			productReference = 96517F9E2FC8FE6E008E6324 /* ZOOMIN.app */;
@@ -667,6 +670,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 28247B8C2FD0462F00DDAC68 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestore;
+		};
+		669EA8DD2FD2A113007FAA4D /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 28247B8C2FD0462F00DDAC68 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
