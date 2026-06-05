@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 import FirebaseFirestore
+import FirebaseStorage
 
 final class IssueStore: ObservableObject {
 
@@ -95,6 +96,7 @@ final class IssueStore: ObservableObject {
             latitude:          latitude,
             longitude:         longitude,
             photoData:         nil,
+            photoURL:          data["photoURL"] as? String,
             supportCount:      supportCount,
             safetyRisk:        safetyRisk,
             urgency:           urgency,
@@ -132,11 +134,13 @@ final class IssueStore: ObservableObject {
         if let summary = issue.completionSummary {
             data["completionSummary"] = summary
         }
+        if let photoURL = issue.photoURL {
+            data["photoURL"] = photoURL
+        }
         return data
     }
 
     // MARK: - Add Report
-
     func addIssue(
         title: String,
         category: IssueCategory,
@@ -168,14 +172,20 @@ final class IssueStore: ObservableObject {
             isMyReport:   true
         )
 
-        // Save to Firestore
-        db.collection("issues")
-            .document(newIssue.id.uuidString)
-            .setData(documentData(from: newIssue)) { error in
-                if let error = error {
-                    print("Add report error: \(error.localizedDescription)")
-                }
+        guard let data = photoData else {
+            db.collection("issues").document(newIssue.id.uuidString).setData(documentData(from: newIssue))
+            return
+        }
+
+        let ref = Storage.storage().reference().child("issue_photos/\(newIssue.id.uuidString).jpg")
+        ref.putData(data) { _, error in
+            if let error = error { print("Photo upload error: \(error)"); return }
+            ref.downloadURL { url, _ in
+                var issue = newIssue
+                issue.photoURL = url?.absoluteString
+                self.db.collection("issues").document(issue.id.uuidString).setData(self.documentData(from: issue))
             }
+        }
     }
 
     // MARK: - Support
