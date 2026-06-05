@@ -313,6 +313,7 @@ struct NearbyIssueCard: View {
                 HStack(spacing: 4) {
                     compactStatusBadge(issue.status)
                     compactRiskBadge(issue.safetyRisk)
+                    Spacer(minLength: 0) // ⭐️ 추가됨: 레이아웃 안정화를 위해 빈 공간 밀어주기
                 }
             }
             // Chevron button — fixed width so it never pushes text
@@ -338,11 +339,14 @@ struct NearbyIssueCard: View {
         }
     }
 
-    // Compact inline badges to prevent line-wrapping
+    // Compact inline badges to prevent line-wrapping (⭐️ 수정된 부분)
     private func compactStatusBadge(_ status: IssueStatus) -> some View {
         HStack(spacing: 3) {
             Image(systemName: status.symbolName).font(.system(size: 9, weight: .semibold))
-            Text(status.displayName).font(.system(size: 10, weight: .semibold, design: .rounded))
+            Text(status.displayName)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
         }
         .foregroundColor(status.badgeColor)
         .padding(.horizontal, 6).padding(.vertical, 3)
@@ -351,6 +355,7 @@ struct NearbyIssueCard: View {
         .cornerRadius(6)
     }
 
+    // ⭐️ 수정된 부분
     private func compactRiskBadge(_ level: Int) -> some View {
         let label: String
         let color: Color
@@ -362,7 +367,11 @@ struct NearbyIssueCard: View {
         }
         return HStack(spacing: 3) {
             Circle().fill(color).frame(width: 5, height: 5)
-            Text(label).font(.system(size: 10, weight: .semibold, design: .rounded)).foregroundColor(color)
+            Text(label)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .foregroundColor(color)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
         }
         .padding(.horizontal, 6).padding(.vertical, 3)
         .background(color.opacity(0.10))
@@ -685,5 +694,3 @@ private struct SearchResultRow: View {
         }
     }
 }
-
-
