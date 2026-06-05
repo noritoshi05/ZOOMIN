@@ -106,7 +106,7 @@ struct AdminDashboardView: View {
                 }
                 Spacer()
                 // 전체 건수 배지
-                Text("\(issueStore.issues.count)건")
+                Text("\(issueStore.issues.count)reports")
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.zoominBlue)
                     .padding(.horizontal, 12)
@@ -134,7 +134,7 @@ struct AdminDashboardView: View {
 
                 // 전체 버튼
                 FilterChip(
-                    label: "전체 (\(issueStore.issues.count))",
+                    label: "All (\(issueStore.issues.count))",
                     isSelected: selectedFilter == nil
                 ) {
                     withAnimation(.easeInOut(duration: 0.2)) {
@@ -174,7 +174,7 @@ struct AdminDashboardView: View {
                     .font(ZOOMINFont.captionBold)
                     .foregroundColor(.textSecondary)
                 Spacer()
-                Text("\(filteredIssues.count)건")
+                Text("\(filteredIssues.count)reports")
                     .font(ZOOMINFont.caption)
                     .foregroundColor(.textTertiary)
             }
@@ -335,7 +335,7 @@ struct AdminIssueCard: View {
                                 Image(systemName: "shield.lefthalf.filled")
                                     .font(.system(size: 11))
                                     .foregroundColor(.riskCritical)
-                                Text("위험 \(issue.safetyRisk)")
+                                Text("Risk \(issue.safetyRisk)")
                                     .font(ZOOMINFont.caption)
                                     .foregroundColor(.textSecondary)
                             }

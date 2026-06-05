@@ -1,6 +1,6 @@
 // IssueStore.swift
 // ZOOMIN - Shared store file
-// Firestore 실시간 연동 버전 (Member 4 수정)
+// Firestore real-time integration version (Member 4 revision)
 
 import Foundation
 import Combine
@@ -8,14 +8,14 @@ import FirebaseFirestore
 
 final class IssueStore: ObservableObject {
 
-    // MARK: - Published 상태
+    // MARK: - Published State
     @Published var issues: [Issue] = []
 
     // MARK: - Firestore
     private let db = Firestore.firestore()
     private var listener: ListenerRegistration?
 
-    // MARK: - 초기화
+    // MARK: - Initialization
     init() {
         startListening()
         SeedData.uploadIfEmpty()
@@ -25,9 +25,9 @@ final class IssueStore: ObservableObject {
         listener?.remove()
     }
 
-    // MARK: - 실시간 리스닝 시작
+    // MARK: - Start Real-time Listening
 
-    /// Firestore issues 컬렉션을 실시간으로 구독
+    /// Subscribe to Firestore issues collection in real time
     func startListening() {
         listener = db.collection("issues")
             .order(by: "reportDate", descending: true)
@@ -35,7 +35,7 @@ final class IssueStore: ObservableObject {
                 guard let self = self else { return }
 
                 if let error = error {
-                    print("Firestore 리스닝 오류: \(error.localizedDescription)")
+                    print("Firestore listening error: \(error.localizedDescription)")
                     return
                 }
 
@@ -49,7 +49,7 @@ final class IssueStore: ObservableObject {
             }
     }
 
-    // MARK: - Firestore 문서 → Issue 변환
+    // MARK: - Firestore Document → Issue Conversion
 
     private func issueFromDocument(_ doc: QueryDocumentSnapshot) -> Issue? {
         let data = doc.data()
@@ -108,7 +108,7 @@ final class IssueStore: ObservableObject {
         )
     }
 
-    // MARK: - Issue → Firestore 딕셔너리 변환
+    // MARK: - Issue → Firestore Dictionary Conversion
 
     private func documentData(from issue: Issue) -> [String: Any] {
         var data: [String: Any] = [
@@ -135,7 +135,7 @@ final class IssueStore: ObservableObject {
         return data
     }
 
-    // MARK: - 신고 추가
+    // MARK: - Add Report
 
     func addIssue(
         title: String,
@@ -168,17 +168,17 @@ final class IssueStore: ObservableObject {
             isMyReport:   true
         )
 
-        // Firestore에 저장
+        // Save to Firestore
         db.collection("issues")
             .document(newIssue.id.uuidString)
             .setData(documentData(from: newIssue)) { error in
                 if let error = error {
-                    print("신고 추가 오류: \(error.localizedDescription)")
+                    print("Add report error: \(error.localizedDescription)")
                 }
             }
     }
 
-    // MARK: - 지지
+    // MARK: - Support
 
     func supportIssue(issueID: UUID) {
         let docRef = db.collection("issues").document(issueID.uuidString)
@@ -186,12 +186,12 @@ final class IssueStore: ObservableObject {
             "supportCount": FieldValue.increment(Int64(1))
         ]) { error in
             if let error = error {
-                print("지지 오류: \(error.localizedDescription)")
+                print("Support error: \(error.localizedDescription)")
             }
         }
     }
 
-    // MARK: - 상태 업데이트 (관리자용)
+    // MARK: - Status Update (Admin)
 
     func updateStatus(issueID: UUID, newStatus: IssueStatus) {
         guard let index = issues.firstIndex(where: { $0.id == issueID }) else { return }
@@ -213,12 +213,12 @@ final class IssueStore: ObservableObject {
         db.collection("issues").document(issueID.uuidString)
             .updateData(updateData) { error in
                 if let error = error {
-                    print("상태 업데이트 오류: \(error.localizedDescription)")
+                    print("Status update error: \(error.localizedDescription)")
                 }
             }
     }
 
-    // MARK: - 완료 보고 추가 (관리자용)
+    // MARK: - Add Completion Report (Admin)
 
     func addCompletionReport(issueID: UUID, summary: String) {
         guard let index = issues.firstIndex(where: { $0.id == issueID }) else { return }
@@ -233,7 +233,7 @@ final class IssueStore: ObservableObject {
                 "rewardPoints":      newPoints
             ]) { error in
                 if let error = error {
-                    print("완료 보고 오류: \(error.localizedDescription)")
+                    print("Completion report error: \(error.localizedDescription)")
                 }
             }
     }
@@ -252,3 +252,4 @@ final class IssueStore: ObservableObject {
         myIssues.reduce(0) { $0 + $1.rewardPoints }
     }
 }
+

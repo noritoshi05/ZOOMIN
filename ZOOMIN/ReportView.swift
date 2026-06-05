@@ -416,7 +416,7 @@ final class ReportLocationManager: NSObject, ObservableObject, CLLocationManager
         case .denied, .restricted:
             statusText = "Location permission required (enable in Settings)"
         @unknown default:
-            statusText = "위치를 가져올 수 없습니다"
+            statusText = "Unable to get location"
         }
     }
 
@@ -432,16 +432,17 @@ final class ReportLocationManager: NSObject, ObservableObject, CLLocationManager
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let loc = locations.last else { return }
         coordinate = loc.coordinate
-        statusText = String(format: "위치 감지됨 (%.5f, %.5f)", loc.coordinate.latitude, loc.coordinate.longitude)
+        statusText = String(format: "Location detected (%.5f, %.5f)", loc.coordinate.latitude, loc.coordinate.longitude)
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        statusText = "위치를 가져올 수 없습니다"
+        statusText = "Unable to get location"
     }
 }
 
-// MARK: - 프리뷰
+// MARK: - Preview
 #Preview {
     ReportView()
         .environmentObject(IssueStore())
 }
+

@@ -1,6 +1,6 @@
 // CompletionReportView.swift
-// ZOOMIN — Member 4 담당
-// 역할: 관리자 완료 보고서 작성 / 처리 결과 요약 / 보상 포인트 지급
+// ZOOMIN — Member 4
+// Role: Admin completion report / Resolution summary / Reward point payout
 
 import SwiftUI
 
@@ -28,16 +28,16 @@ struct CompletionReportView: View {
                 ScrollView {
                     VStack(spacing: ZOOMINLayout.paddingMedium) {
 
-                        // 1. 이슈 요약
+                        // 1. Issue summary
                         issueSnapshotCard
 
-                        // 2. 보고서 작성 폼
+                        // 2. Report form
                         reportFormSection
 
-                        // 3. 제출 후 보상 미리보기
+                        // 3. Reward preview after submission
                         rewardPreviewCard
 
-                        // 4. 제출 버튼
+                        // 4. Submit button
                         submitButton
                     }
                     .padding(.horizontal, ZOOMINLayout.paddingMedium)
@@ -49,13 +49,13 @@ struct CompletionReportView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("취소") { dismiss() }
+                    Button("Cancel") { dismiss() }
                         .foregroundColor(.textSecondary)
                 }
             }
             .alert("Mark as completed?", isPresented: $showConfirm) {
-                Button("완료 처리", role: .destructive) { submitReport() }
-                Button("취소", role: .cancel) {}
+                Button("Mark Complete", role: .destructive) { submitReport() }
+                Button("Cancel", role: .cancel) {}
             } message: {
                 Text("Status will be set to Completed and reward points will be sent to the reporter.")
             }
@@ -67,7 +67,7 @@ struct CompletionReportView: View {
         }
     }
 
-    // MARK: - 이슈 요약 카드
+    // MARK: - Issue Snapshot Card
 
     private var issueSnapshotCard: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -84,7 +84,7 @@ struct CompletionReportView: View {
             Divider()
 
             HStack(alignment: .top, spacing: 12) {
-                // 카테고리 아이콘
+                // Category icon
                 ZStack {
                     Color(issue.category.markerColor).opacity(0.12)
                     Image(systemName: issue.category.symbolName)
@@ -110,7 +110,7 @@ struct CompletionReportView: View {
                 Spacer()
             }
 
-            // 신고 내용 간략 표시
+            // Brief report content
             if !issue.description.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     Text("Report Description")
@@ -129,7 +129,7 @@ struct CompletionReportView: View {
         .zoominCard()
     }
 
-    // MARK: - 보고서 작성 폼
+    // MARK: - Report Form
 
     private var reportFormSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -146,7 +146,7 @@ struct CompletionReportView: View {
                     )
             }
 
-            // 텍스트 에디터
+            // Text editor
             ZStack(alignment: .topLeading) {
                 if summaryText.isEmpty {
                     Text("Briefly describe the resolution. e.g. Pothole repaired on June 1, 2024. Monitoring scheduled for 6 months.")
@@ -177,18 +177,18 @@ struct CompletionReportView: View {
                     )
             )
 
-            // 최소 글자 수 안내
+            // Minimum character count hint
             if !isSubmittable && !summaryText.isEmpty {
                 HStack(spacing: 4) {
                     Image(systemName: "info.circle")
                         .font(.system(size: 11))
-                    Text("최소 10자 이상 입력해 주세요 (현재 \(summaryText.count)자)")
+                    Text("Please enter at least 10 characters (current: \(summaryText.count))")
                 }
                 .font(ZOOMINFont.micro)
                 .foregroundColor(.statusInProgress)
             }
 
-            // 작성 가이드
+            // Writing guide
             VStack(alignment: .leading, spacing: 4) {
                 Text("Writing Guide")
                     .font(ZOOMINFont.captionBold)
@@ -211,7 +211,7 @@ struct CompletionReportView: View {
         .zoominCard()
     }
 
-    // MARK: - 보상 미리보기
+    // MARK: - Reward Preview
 
     private var rewardPreviewCard: some View {
         HStack(spacing: 12) {
@@ -242,7 +242,7 @@ struct CompletionReportView: View {
         .zoominCard()
     }
 
-    // MARK: - 제출 버튼
+    // MARK: - Submit Button
 
     private var submitButton: some View {
         Button {
@@ -259,7 +259,7 @@ struct CompletionReportView: View {
         .disabled(!isSubmittable)
     }
 
-    // MARK: - 제출 실행
+    // MARK: - Submit Action
 
     private func submitReport() {
         issueStore.addCompletionReport(
@@ -276,3 +276,4 @@ struct CompletionReportView: View {
     CompletionReportView(issue: IssueStore().issues[0])
         .environmentObject(IssueStore())
 }
+

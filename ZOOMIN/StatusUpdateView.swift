@@ -1,6 +1,6 @@
 // StatusUpdateView.swift
-// ZOOMIN — Member 4 담당
-// 역할: 관리자 상태 변경 시트 (접수됨 → 검토 중 → 처리 중 → 완료)
+// ZOOMIN — Member 4
+// Role: Admin status update sheet (Received → Reviewing → In Progress → Completed)
 
 import SwiftUI
 
@@ -28,16 +28,16 @@ struct StatusUpdateView: View {
                 ScrollView {
                     VStack(spacing: ZOOMINLayout.paddingMedium) {
 
-                        // 1. 이슈 요약 카드
+                        // 1. Issue snapshot card
                         issueSnapshotCard
 
-                        // 2. 상태 선택 섹션
+                        // 2. Status picker section
                         statusPickerSection
 
-                        // 3. 상태 변경 안내
+                        // 3. Status change info
                         rewardInfoCard
 
-                        // 4. 완료 처리 시 보고서 버튼
+                        // 4. Completion report button (when marking complete)
                         if selectedStatus == .completed && (issue.completionSummary == nil || issue.completionSummary?.isEmpty == true) {
                             completionReportButton
                         } else if selectedStatus == .completed {
@@ -54,7 +54,7 @@ struct StatusUpdateView: View {
                             .cornerRadius(ZOOMINLayout.cornerRadiusMedium)
                         }
 
-                        // 5. 저장 버튼
+                        // 5. Save button
                         saveButton
                     }
                     .padding(.horizontal, ZOOMINLayout.paddingMedium)
@@ -83,11 +83,11 @@ struct StatusUpdateView: View {
         }
     }
 
-    // MARK: - 이슈 요약 카드
+    // MARK: - Issue Snapshot Card
 
     private var issueSnapshotCard: some View {
         HStack(alignment: .top, spacing: 12) {
-            // 카테고리 아이콘
+            // Category icon
             ZStack {
                 Color(issue.category.markerColor).opacity(0.12)
                 Image(systemName: issue.category.symbolName)
@@ -107,14 +107,14 @@ struct StatusUpdateView: View {
                     .foregroundColor(.textSecondary)
 
                 HStack(spacing: 8) {
-                    // 현재 상태
+                    // Current status
                     ZOOMINStatusBadge(status: issue.status)
-                    // 우선순위 점수
+                    // Priority score
                     HStack(spacing: 3) {
                         Image(systemName: "chart.bar.fill")
                             .font(.system(size: 11))
                             .foregroundColor(.zoominBlue)
-                        Text("점수 \(issue.priorityScore)")
+                        Text("Score \(issue.priorityScore)")
                             .font(ZOOMINFont.captionBold)
                             .foregroundColor(.zoominBlue)
                     }
@@ -125,7 +125,7 @@ struct StatusUpdateView: View {
         .zoominCard()
     }
 
-    // MARK: - 상태 선택 섹션
+    // MARK: - Status Picker Section
 
     private var statusPickerSection: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -148,7 +148,7 @@ struct StatusUpdateView: View {
                 }
             }
 
-            // 상태 흐름 안내
+            // Status flow hint
             HStack(spacing: 4) {
                 Image(systemName: "info.circle")
                     .font(.system(size: 11))
@@ -161,7 +161,7 @@ struct StatusUpdateView: View {
         .zoominCard()
     }
 
-    // 뒤로 가는 상태는 비활성화
+    // Disable reverting to a previous status
     private func isStatusDisabled(_ status: IssueStatus) -> Bool {
         let order: [IssueStatus] = [.received, .reviewing, .inProgress, .completed]
         guard let currentIdx = order.firstIndex(of: issue.status),
@@ -169,7 +169,7 @@ struct StatusUpdateView: View {
         return targetIdx < currentIdx
     }
 
-    // MARK: - 보상 안내 카드
+    // MARK: - Reward Info Card
 
     private var rewardInfoCard: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -196,7 +196,7 @@ struct StatusUpdateView: View {
         .zoominCard()
     }
 
-    // MARK: - 완료 보고서 버튼
+    // MARK: - Completion Report Button
 
     private var completionReportButton: some View {
         Button {
@@ -211,7 +211,7 @@ struct StatusUpdateView: View {
         .zoominSecondaryButton()
     }
 
-    // MARK: - 저장 버튼
+    // MARK: - Save Button
 
     private var saveButton: some View {
         Button {
@@ -234,7 +234,7 @@ struct StatusUpdateView: View {
         .zoominPrimaryButton()
     }
 
-    // MARK: - 상태 업데이트 실행
+    // MARK: - Apply Status Update
 
     private func applyStatusUpdate() {
         issueStore.updateStatus(issueID: issue.id, newStatus: selectedStatus)
@@ -242,7 +242,7 @@ struct StatusUpdateView: View {
     }
 }
 
-// MARK: - 상태 선택 행
+// MARK: - Status Option Row
 
 private struct StatusOptionRow: View {
     let status: IssueStatus
@@ -254,7 +254,7 @@ private struct StatusOptionRow: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                // 상태 아이콘
+                // Status icon
                 ZStack {
                     Circle()
                         .fill(isDisabled
@@ -266,7 +266,7 @@ private struct StatusOptionRow: View {
                         .foregroundColor(isDisabled ? .textTertiary : status.badgeColor)
                 }
 
-                // 라벨
+                // Label
                 VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(status.displayName)
@@ -291,7 +291,7 @@ private struct StatusOptionRow: View {
 
                 Spacer()
 
-                // 선택 라디오
+                // Selection radio
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 22))
                     .foregroundColor(isSelected ? .zoominBlue : .textTertiary.opacity(0.5))
@@ -317,7 +317,7 @@ private struct StatusOptionRow: View {
     }
 }
 
-// MARK: - 보상 안내 행
+// MARK: - Reward Info Row
 
 private struct RewardInfoRow: View {
     let icon: String
@@ -348,3 +348,4 @@ private struct RewardInfoRow: View {
     StatusUpdateView(issue: IssueStore().issues[0])
         .environmentObject(IssueStore())
 }
+
