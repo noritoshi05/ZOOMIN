@@ -46,6 +46,9 @@ struct ReportView: View {
     @State private var showSuccess = false
     @State private var errorMessage: String?
 
+    // 키보드 포커스 추적
+    @FocusState private var isAnyFieldFocused: Bool
+
     private let maxDescription = 300
 
     // Validation: submittable when category + title + location are set
@@ -74,6 +77,8 @@ struct ReportView: View {
                     .padding(.horizontal, ZOOMINLayout.paddingMedium)
                     .padding(.top, ZOOMINLayout.paddingMedium)
                 }
+                // 스크롤하면 키보드 자동 내려감 → 탭바 다시 보임
+                .scrollDismissesKeyboard(.interactively)
 
                 // Fixed bottom submit button
                 VStack {
@@ -90,8 +95,19 @@ struct ReportView: View {
             .navigationTitle("Report an Issue")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                // 키보드가 올라와 있을 때만 "완료" 버튼 표시 → 누르면 키보드 내려가고 탭바 복귀
                 ToolbarItem(placement: .topBarTrailing) {
-                    if isSubmitting { ProgressView() }
+                    if isAnyFieldFocused {
+                        Button {
+                            isAnyFieldFocused = false
+                        } label: {
+                            Text("Done")
+                                .font(ZOOMINFont.captionBold)
+                                .foregroundColor(.zoominBlue)
+                        }
+                    } else if isSubmitting {
+                        ProgressView()
+                    }
                 }
             }
             .onAppear { locationManager.request() }
@@ -154,6 +170,7 @@ struct ReportView: View {
                     RoundedRectangle(cornerRadius: ZOOMINLayout.cornerRadiusMedium)
                         .stroke(Color.surfaceTertiary, lineWidth: 1)
                 )
+                .focused($isAnyFieldFocused)
         }
     }
 
@@ -244,6 +261,7 @@ struct ReportView: View {
                     .padding(.horizontal, ZOOMINLayout.paddingMedium - 4)
                     .padding(.vertical, 8)
                     .frame(height: 120)
+                    .focused($isAnyFieldFocused)
                     .onChange(of: description) { _, newValue in
                         if newValue.count > maxDescription {
                             description = String(newValue.prefix(maxDescription))
@@ -445,4 +463,5 @@ final class ReportLocationManager: NSObject, ObservableObject, CLLocationManager
     ReportView()
         .environmentObject(IssueStore())
 }
+
 
